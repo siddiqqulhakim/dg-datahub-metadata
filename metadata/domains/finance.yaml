@@ -36,19 +36,19 @@ owners:
     source: MANUAL
 
 subDomains:
-  - urn: "urn:li:domain:finance.accounts_payable"
+  - urn: "urn:li:domain:finance__accounts_payable"
     name: "Accounts Payable"
     description: "Invoices, supplier payments, vendor management data."
-  - urn: "urn:li:domain:finance.accounts_receivable"
+  - urn: "urn:li:domain:finance__accounts_receivable"
     name: "Accounts Receivable"
     description: "Customer invoices, receipts, aging reports."
-  - urn: "urn:li:domain:finance.general_ledger"
+  - urn: "urn:li:domain:finance__general_ledger"
     name: "General Ledger"
     description: "Chart of accounts, journal entries, period close data."
-  - urn: "urn:li:domain:finance.treasury"
+  - urn: "urn:li:domain:finance__treasury"
     name: "Treasury"
     description: "Cash management, FX positions, liquidity forecasting."
-  - urn: "urn:li:domain:finance.regulatory"
+  - urn: "urn:li:domain:finance__regulatory"
     name: "Regulatory Reporting"
     description: "IFRS, GAAP, SOX compliance and regulatory filing data."
 

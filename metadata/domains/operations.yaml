@@ -27,16 +27,16 @@ owners:
     source: MANUAL
 
 subDomains:
-  - urn: "urn:li:domain:operations.orders"
+  - urn: "urn:li:domain:operations__orders"
     name: "Orders"
     description: "Order lifecycle from placement to delivery."
-  - urn: "urn:li:domain:operations.inventory"
+  - urn: "urn:li:domain:operations__inventory"
     name: "Inventory"
     description: "Stock levels, movements, replenishment triggers."
-  - urn: "urn:li:domain:operations.logistics"
+  - urn: "urn:li:domain:operations__logistics"
     name: "Logistics"
     description: "Shipment tracking, carrier performance, cost per shipment."
-  - urn: "urn:li:domain:operations.returns"
+  - urn: "urn:li:domain:operations__returns"
     name: "Returns & Refunds"
     description: "Return reasons, refund cycles, warranty claims."
 

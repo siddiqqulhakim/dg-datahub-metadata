@@ -9,9 +9,9 @@ This directory contains DataHub ingestion recipe YAML files for all data sources
 ```
 ingestion/
 └── sources/
-    ├── snowflake-dev.yaml      # Snowflake DEV environment
-    ├── snowflake-prod.yaml     # Snowflake PROD environment
-    ├── dbt-prod.yaml           # dbt PROD project
+    ├── snowflake_dev.yaml      # Snowflake DEV environment
+    ├── snowflake_prod.yaml     # Snowflake PROD environment
+    ├── dbt_prod.yaml           # dbt PROD project
     └── ...                     # Add new sources here
 ```
 
@@ -20,15 +20,17 @@ ingestion/
 ## File Naming Convention
 
 ```
-<source-type>-<environment>.yaml
+<source_type>_<environment>.yaml
 ```
 
+Use underscores as word separators — hyphens and dots are not allowed (reserved for DNS/IP/infra naming).
+
 Examples:
-- `snowflake-dev.yaml`
-- `snowflake-prod.yaml`
-- `bigquery-prod.yaml`
-- `kafka-dev.yaml`
-- `dbt-prod.yaml`
+- `snowflake_dev.yaml`
+- `snowflake_prod.yaml`
+- `bigquery_prod.yaml`
+- `kafka_dev.yaml`
+- `dbt_prod.yaml`
 
 ---
 
@@ -36,7 +38,7 @@ Examples:
 
 1. Copy the closest existing recipe as a template
 2. Update all source-specific configuration
-3. Test locally: `datahub ingest -c ingestion/sources/<source>-dev.yaml`
+3. Test locally: `datahub ingest -c ingestion/sources/<source>_dev.yaml`
 4. Add required environment variables to the GitHub Actions secrets
 5. Open a PR — `@data-platform/platform-engineering` will review
 
@@ -48,15 +50,15 @@ All recipes use environment variables for credentials. Never hardcode credential
 
 | Variable | Used By | GitHub Secret |
 |---|---|---|
-| `SNOWFLAKE_ACCOUNT_DEV` | snowflake-dev.yaml | `SNOWFLAKE_ACCOUNT_DEV` |
-| `SNOWFLAKE_ACCOUNT_PROD` | snowflake-prod.yaml | `SNOWFLAKE_ACCOUNT_PROD` |
-| `SNOWFLAKE_USER_DEV` | snowflake-dev.yaml | `SNOWFLAKE_USER_DEV` |
-| `SNOWFLAKE_PASSWORD_DEV` | snowflake-dev.yaml | `SNOWFLAKE_PASSWORD_DEV` |
-| `SNOWFLAKE_PRIVATE_KEY_PATH` | snowflake-prod.yaml | `SNOWFLAKE_PRIVATE_KEY_PATH` |
+| `SNOWFLAKE_ACCOUNT_DEV` | snowflake_dev.yaml | `SNOWFLAKE_ACCOUNT_DEV` |
+| `SNOWFLAKE_ACCOUNT_PROD` | snowflake_prod.yaml | `SNOWFLAKE_ACCOUNT_PROD` |
+| `SNOWFLAKE_USER_DEV` | snowflake_dev.yaml | `SNOWFLAKE_USER_DEV` |
+| `SNOWFLAKE_PASSWORD_DEV` | snowflake_dev.yaml | `SNOWFLAKE_PASSWORD_DEV` |
+| `SNOWFLAKE_PRIVATE_KEY_PATH` | snowflake_prod.yaml | `SNOWFLAKE_PRIVATE_KEY_PATH` |
 | `DATAHUB_GMS_URL` | all | Loaded from `environments/<env>/config.env` |
 | `DATAHUB_GMS_TOKEN` | all | `DATAHUB_TOKEN_DEV` / `DATAHUB_TOKEN_PROD` |
-| `DBT_MANIFEST_PATH` | dbt-prod.yaml | `DBT_MANIFEST_PATH` |
-| `DBT_CATALOG_PATH` | dbt-prod.yaml | `DBT_CATALOG_PATH` |
+| `DBT_MANIFEST_PATH` | dbt_prod.yaml | `DBT_MANIFEST_PATH` |
+| `DBT_CATALOG_PATH` | dbt_prod.yaml | `DBT_CATALOG_PATH` |
 
 ---
 
@@ -64,9 +66,8 @@ All recipes use environment variables for credentials. Never hardcode credential
 
 | Source | Recipe File | Notes |
 |---|---|---|
-| Snowflake | `snowflake-*.yaml` | Key-pair auth in prod |
-| dbt | `dbt-prod.yaml` | Reads manifest/catalog from S3 |
-| BigQuery | `bigquery-prod.yaml` | *(add when needed)* |
-| Kafka | `kafka-dev.yaml` | *(add when needed)* |
-| PostgreSQL | `postgres-dev.yaml` | *(add when needed)* |
-
+| Snowflake | `snowflake_*.yaml` | Key-pair auth in prod |
+| dbt | `dbt_prod.yaml` | Reads manifest/catalog from S3 |
+| BigQuery | `bigquery_prod.yaml` | *(add when needed)* |
+| Kafka | `kafka_dev.yaml` | *(add when needed)* |
+| PostgreSQL | `postgres_dev.yaml` | *(add when needed)* |

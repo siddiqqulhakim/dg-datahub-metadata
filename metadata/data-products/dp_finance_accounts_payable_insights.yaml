@@ -61,15 +61,15 @@ outputAssets:
     certificationStatus: "CERTIFIED"
 
 tags:
-  - urn: "urn:li:tag:sensitivity.financial"
-  - urn: "urn:li:tag:compliance.sox"
-  - urn: "urn:li:tag:sla.high"
+  - urn: "urn:li:tag:sensitivity__financial"
+  - urn: "urn:li:tag:compliance__sox"
+  - urn: "urn:li:tag:sla__high"
   - urn: "urn:li:tag:certified"
 
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
-  - urn: "urn:li:glossaryTerm:finance.CashFlow"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance__CashFlow"
 
 # ── Consumer SLA ─────────────────────────────────────────────
 sla:

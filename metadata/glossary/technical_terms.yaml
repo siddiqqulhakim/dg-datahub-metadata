@@ -18,16 +18,16 @@ nodes:
       - type: STEWARD
         id: "urn:li:corpuser:carlos.rodriguez"
 
-  - urn: "urn:li:glossaryNode:Technical.DataQuality"
-    name: "Technical.DataQuality"
+  - urn: "urn:li:glossaryNode:Technical__DataQuality"
+    name: "Technical__DataQuality"
     parentNode: "urn:li:glossaryNode:Technical"
     description: "Data quality measurement and scoring concepts."
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:diana.lee"
 
-  - urn: "urn:li:glossaryNode:Technical.Architecture"
-    name: "Technical.Architecture"
+  - urn: "urn:li:glossaryNode:Technical__Architecture"
+    name: "Technical__Architecture"
     parentNode: "urn:li:glossaryNode:Technical"
     description: "Platform architecture patterns (Medallion, Lakehouse, etc.)."
     owners:
@@ -35,7 +35,7 @@ nodes:
         id: "urn:li:corpuser:carlos.rodriguez"
 
 terms:
-  - urn: "urn:li:glossaryTerm:technical.DataQualityScore"
+  - urn: "urn:li:glossaryTerm:technical__DataQualityScore"
     name: "DataQualityScore"
     definition: |
       A row-level composite score between 0 and 100 that measures the overall
@@ -43,7 +43,7 @@ terms:
       individual DQ dimensions: completeness (30%), validity (30%), uniqueness (20%),
       consistency (20%). A score ≥ 95 is considered "high quality". Scores below 80
       trigger data quality alerts.
-    parentNode: "urn:li:glossaryNode:Technical.DataQuality"
+    parentNode: "urn:li:glossaryNode:Technical__DataQuality"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:diana.lee"
@@ -52,7 +52,7 @@ terms:
       passing_threshold: "95"
       alert_threshold: "80"
 
-  - urn: "urn:li:glossaryTerm:technical.GoldDataset"
+  - urn: "urn:li:glossaryTerm:technical__GoldDataset"
     name: "GoldDataset"
     definition: |
       A Gold dataset is the highest certification tier in the Medallion
@@ -61,7 +61,7 @@ terms:
       Gold datasets must pass a formal certification process, have a documented
       SLA, at least one DATAOWNER and one STEWARD, and full lineage documented
       to source systems.
-    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    parentNode: "urn:li:glossaryNode:Technical__Architecture"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:carlos.rodriguez"
@@ -70,7 +70,7 @@ terms:
       sla_required: "true"
       lineage_required: "true"
 
-  - urn: "urn:li:glossaryTerm:technical.MedallionArchitecture"
+  - urn: "urn:li:glossaryTerm:technical__MedallionArchitecture"
     name: "MedallionArchitecture"
     definition: |
       A data design pattern that organises data into quality tiers in a
@@ -80,12 +80,12 @@ terms:
         SILVER — Business-conformed. Enriched. Analytics-ready for teams.
         GOLD   — Certified aggregations. SLA-backed. Executive-grade.
       Each tier builds on the previous, with explicit lineage documented.
-    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    parentNode: "urn:li:glossaryNode:Technical__Architecture"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:carlos.rodriguez"
 
-  - urn: "urn:li:glossaryTerm:technical.SurrogateKey"
+  - urn: "urn:li:glossaryTerm:technical__SurrogateKey"
     name: "SurrogateKey"
     definition: |
       A surrogate key is a system-generated, meaningless identifier assigned to
@@ -97,7 +97,7 @@ terms:
       - type: STEWARD
         id: "urn:li:corpuser:diana.lee"
 
-  - urn: "urn:li:glossaryTerm:technical.SlowlyChangingDimension"
+  - urn: "urn:li:glossaryTerm:technical__SlowlyChangingDimension"
     name: "SlowlyChangingDimension"
     definition: |
       A Slowly Changing Dimension (SCD) is a dimension table design pattern that
@@ -105,7 +105,7 @@ terms:
       dimension tables: when an attribute changes, the existing row is closed
       (is_current=false, valid_to=change_date) and a new row is inserted
       (is_current=true, valid_from=change_date, valid_to=9999-12-31).
-    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    parentNode: "urn:li:glossaryNode:Technical__Architecture"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:diana.lee"

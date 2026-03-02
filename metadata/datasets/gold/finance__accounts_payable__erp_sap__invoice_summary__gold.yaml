@@ -1,6 +1,6 @@
 ---
 # ============================================================
-# Dataset: finance.accounts_payable.erp_sap.invoice_summary.gold
+# Dataset: finance__accounts_payable__erp_sap__invoice_summary__gold
 # Layer:   GOLD (certified, analytics-ready, SLA-backed aggregation)
 # ============================================================
 # Gold datasets MUST have:
@@ -17,7 +17,7 @@ version: "1"
 kind: dataset
 
 urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.gold_finance.ap_invoice_summary,PROD)"
-name: "finance.accounts_payable.erp_sap.invoice_summary.gold"
+name: "finance__accounts_payable__erp_sap__invoice_summary__gold"
 platform: "urn:li:dataPlatform:snowflake"
 
 description: |
@@ -36,7 +36,7 @@ description: |
   **Consumer SLA:** 99.9% daily availability
 
 domain: "urn:li:domain:finance"
-subDomain: "urn:li:domain:finance.accounts_payable"
+subDomain: "urn:li:domain:finance__accounts_payable"
 
 # ── CERTIFICATION BLOCK (REQUIRED for Gold) ──────────────────
 certification:
@@ -66,19 +66,19 @@ owners:
     source: MANUAL
 
 tags:
-  - urn: "urn:li:tag:sensitivity.financial"
-  - urn: "urn:li:tag:layer.gold"
+  - urn: "urn:li:tag:sensitivity__financial"
+  - urn: "urn:li:tag:layer__gold"
   - urn: "urn:li:tag:certified"
-  - urn: "urn:li:tag:usage.analytics_ready"
-  - urn: "urn:li:tag:usage.executive_reporting"
-  - urn: "urn:li:tag:sla.high"
+  - urn: "urn:li:tag:usage__analytics_ready"
+  - urn: "urn:li:tag:usage__executive_reporting"
+  - urn: "urn:li:tag:sla__high"
 
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
-  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
-  - urn: "urn:li:glossaryTerm:finance.CashFlow"
-  - urn: "urn:li:glossaryTerm:technical.GoldDataset"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance__InvoiceStatus"
+  - urn: "urn:li:glossaryTerm:finance__CashFlow"
+  - urn: "urn:li:glossaryTerm:technical__GoldDataset"
 
 schema:
   fields:
@@ -88,7 +88,7 @@ schema:
       description: "Surrogate key: MD5(<fiscal_month>|<company_code>|<vendor_id>|<invoice_status>|<cost_centre>)."
       nullable: false
       tags:
-        - urn: "urn:li:tag:field.primary_key"
+        - urn: "urn:li:tag:field__primary_key"
 
     - name: "fiscal_month"
       type: STRING
@@ -96,7 +96,7 @@ schema:
       description: "Fiscal month in YYYY-MM format."
       nullable: false
       tags:
-        - urn: "urn:li:tag:field.partition_key"
+        - urn: "urn:li:tag:field__partition_key"
 
     - name: "fiscal_year"
       type: INTEGER
@@ -200,7 +200,7 @@ schema:
       description: "Average DPO across all invoices in this bucket."
       nullable: true
       glossaryTerms:
-        - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+        - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
 
     - name: "overdue_invoice_count"
       type: INTEGER

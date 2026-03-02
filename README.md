@@ -127,11 +127,11 @@ datahub-governance/
 │   └── check_owners.py            # Ownership completeness checks
 │
 ├── docs/
-│   ├── governance-model.md         # Governance philosophy & roles
-│   ├── naming-convention.md        # Full naming rules & examples
-│   ├── ownership-model.md          # Ownership types & responsibilities
-│   ├── certification-process.md    # Dataset certification workflow
-│   └── glossary-structure.md      # Glossary hierarchy & governance
+│   ├── governance_model.md         # Governance philosophy & roles
+│   ├── naming_convention.md        # Full naming rules & examples
+│   ├── ownership_model.md          # Ownership types & responsibilities
+│   ├── certification_process.md    # Dataset certification workflow
+│   └── glossary_structure.md       # Glossary hierarchy & governance
 │
 ├── requirements.txt
 ├── .gitignore
@@ -165,7 +165,7 @@ Data Products follow:
 dp_<domain>_<business_purpose>
 ```
 
-See [`docs/naming-convention.md`](docs/naming-convention.md) for the full specification.
+See [`docs/naming_convention.md`](docs/naming_convention.md) for the full specification.
 
 ---
 
@@ -197,11 +197,11 @@ See [`docs/naming-convention.md`](docs/naming-convention.md) for the full specif
 
 | Document | Description |
 |---|---|
-| [Governance Model](docs/governance-model.md) | Philosophy, roles, responsibilities |
-| [Naming Convention](docs/naming-convention.md) | Full naming rules |
-| [Ownership Model](docs/ownership-model.md) | Owner types and responsibilities |
-| [Certification Process](docs/certification-process.md) | How to certify a dataset |
-| [Glossary Structure](docs/glossary-structure.md) | Glossary hierarchy and governance |
+ [Governance Model](docs/governance_model.md)  Philosophy, roles, responsibilities 
+ [Naming Convention](docs/naming_convention.md)  Full naming rules 
+ [Ownership Model](docs/ownership_model.md)  Owner types and responsibilities           
+ [Certification Process](docs/certification_process.md)  How to certify a dataset 
+ [Glossary Structure](docs/glossary_structure.md)  Glossary hierarchy and governance 
 | [Contributing Guide](CONTRIBUTING.md) | How to contribute changes |
 
 ---

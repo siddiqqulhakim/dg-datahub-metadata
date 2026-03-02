@@ -29,16 +29,16 @@ nodes:
       - type: STEWARD
         id: "urn:li:corpuser:mary.johnson"
 
-  - urn: "urn:li:glossaryNode:Finance.AccountsPayable"
-    name: "Finance.AccountsPayable"
+  - urn: "urn:li:glossaryNode:Finance__AccountsPayable"
+    name: "Finance__AccountsPayable"
     parentNode: "urn:li:glossaryNode:Finance"
     description: "Terms specific to the accounts payable process."
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:mary.johnson"
 
-  - urn: "urn:li:glossaryNode:Finance.Revenue"
-    name: "Finance.Revenue"
+  - urn: "urn:li:glossaryNode:Finance__Revenue"
+    name: "Finance__Revenue"
     parentNode: "urn:li:glossaryNode:Finance"
     description: "Terms related to revenue recognition and reporting."
     owners:
@@ -62,34 +62,34 @@ nodes:
 # ── GLOSSARY TERMS ───────────────────────────────────────────
 terms:
   # ── Finance / Accounts Payable ──────────────────────────────
-  - urn: "urn:li:glossaryTerm:finance.Invoice"
+  - urn: "urn:li:glossaryTerm:finance__Invoice"
     name: "Invoice"
     definition: |
       A commercial document issued by a vendor (seller) to a buyer specifying
       the goods or services provided, the quantities, agreed prices, payment
       terms, and the total amount owed. In the context of Accounts Payable,
       an invoice represents a liability until it is paid.
-    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance__AccountsPayable"
     domain: "urn:li:domain:finance"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:mary.johnson"
     relatedTerms:
-      - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-      - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+      - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+      - urn: "urn:li:glossaryTerm:finance__PaymentTerms"
     customProperties:
       source: "Finance Domain Policy FIN-001"
       approved_by: "CFO Office"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
     name: "AccountsPayable"
     definition: |
       A balance sheet liability account representing the total amount owed by a
       company to its creditors (vendors/suppliers) for goods and services received
       but not yet paid for. Accounts Payable is a component of working capital
       and is managed through the AP sub-ledger in the ERP system.
-    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance__AccountsPayable"
     domain: "urn:li:domain:finance"
     owners:
       - type: STEWARD
@@ -99,7 +99,7 @@ terms:
       approved_by: "CFO Office"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
     name: "DaysPayableOutstanding"
     definition: |
       Days Payable Outstanding (DPO) measures how many days, on average, a company
@@ -107,7 +107,7 @@ terms:
         DPO = (Accounts Payable / Cost of Goods Sold) × Number of Days
       A higher DPO indicates that the company is taking longer to pay its suppliers,
       which can improve cash flow but may strain vendor relationships.
-    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance__AccountsPayable"
     domain: "urn:li:domain:finance"
     owners:
       - type: STEWARD
@@ -118,7 +118,7 @@ terms:
       approved_by: "CFO Office"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+  - urn: "urn:li:glossaryTerm:finance__PaymentTerms"
     name: "PaymentTerms"
     definition: |
       The contractually agreed conditions under which a buyer will pay a vendor.
@@ -126,7 +126,7 @@ terms:
       early payment. Common examples: Net 30 (full payment due within 30 days),
       2/10 Net 30 (2% discount if paid within 10 days, otherwise full amount due
       within 30 days), Net 60, EOM (End of Month).
-    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance__AccountsPayable"
     domain: "urn:li:domain:finance"
     owners:
       - type: STEWARD
@@ -135,7 +135,7 @@ terms:
       source: "Procurement Policy PROC-004"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+  - urn: "urn:li:glossaryTerm:finance__InvoiceStatus"
     name: "InvoiceStatus"
     definition: |
       The current lifecycle stage of an AP invoice. Valid values are:
@@ -144,7 +144,7 @@ terms:
         OVERDUE    — Payment is past due date and not yet paid
         DISPUTED   — Invoice is under dispute with the vendor
         CANCELLED  — Invoice has been voided/reversed
-    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance__AccountsPayable"
     domain: "urn:li:domain:finance"
     owners:
       - type: STEWARD
@@ -153,7 +153,7 @@ terms:
       valid_values: "OPEN,PAID,OVERDUE,DISPUTED,CANCELLED"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:finance.CashFlow"
+  - urn: "urn:li:glossaryTerm:finance__CashFlow"
     name: "CashFlow"
     definition: |
       The net amount of cash and cash equivalents moving into and out of a business
@@ -171,7 +171,7 @@ terms:
       review_date: "2025-07-01"
 
   # ── Marketing ────────────────────────────────────────────────
-  - urn: "urn:li:glossaryTerm:marketing.CampaignROI"
+  - urn: "urn:li:glossaryTerm:marketing__CampaignROI"
     name: "CampaignROI"
     definition: |
       Return on Investment for a marketing campaign, calculated as:
@@ -187,7 +187,7 @@ terms:
       formula: "((attributed_revenue - cost) / cost) * 100"
       review_date: "2025-07-01"
 
-  - urn: "urn:li:glossaryTerm:marketing.CustomerAcquisitionCost"
+  - urn: "urn:li:glossaryTerm:marketing__CustomerAcquisitionCost"
     name: "CustomerAcquisitionCost"
     definition: |
       The total cost of acquiring a new customer, calculated as the total marketing
@@ -203,7 +203,7 @@ terms:
       review_date: "2025-07-01"
 
   # ── Operations ───────────────────────────────────────────────
-  - urn: "urn:li:glossaryTerm:operations.OrderFulfillmentRate"
+  - urn: "urn:li:glossaryTerm:operations__OrderFulfillmentRate"
     name: "OrderFulfillmentRate"
     definition: |
       The percentage of customer orders that are fulfilled completely and on time

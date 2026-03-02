@@ -1,6 +1,6 @@
 ---
 # ============================================================
-# Dataset: finance.accounts_payable.erp_sap.invoice.silver
+# Dataset: finance__accounts_payable__erp_sap__invoice__silver
 # Layer:   SILVER (business-conformed, enriched, ready for analytics)
 # ============================================================
 # Silver applies business logic transformations:
@@ -15,7 +15,7 @@ version: "1"
 kind: dataset
 
 urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.silver_finance.ap_invoice,PROD)"
-name: "finance.accounts_payable.erp_sap.invoice.silver"
+name: "finance__accounts_payable__erp_sap__invoice__silver"
 platform: "urn:li:dataPlatform:snowflake"
 
 description: |
@@ -34,7 +34,7 @@ description: |
   **Certified for use in:** AP Aging, Vendor Performance, Cash Flow Forecasting
 
 domain: "urn:li:domain:finance"
-subDomain: "urn:li:domain:finance.accounts_payable"
+subDomain: "urn:li:domain:finance__accounts_payable"
 
 owners:
   - type: DATAOWNER
@@ -48,18 +48,18 @@ owners:
     source: MANUAL
 
 tags:
-  - urn: "urn:li:tag:sensitivity.financial"
-  - urn: "urn:li:tag:layer.silver"
-  - urn: "urn:li:tag:source.sap_erp"
-  - urn: "urn:li:tag:usage.analytics_ready"
-  - urn: "urn:li:tag:usage.self_service"
+  - urn: "urn:li:tag:sensitivity__financial"
+  - urn: "urn:li:tag:layer__silver"
+  - urn: "urn:li:tag:source__sap_erp"
+  - urn: "urn:li:tag:usage__analytics_ready"
+  - urn: "urn:li:tag:usage__self_service"
 
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.Invoice"
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
-  - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
-  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+  - urn: "urn:li:glossaryTerm:finance__Invoice"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance__PaymentTerms"
+  - urn: "urn:li:glossaryTerm:finance__InvoiceStatus"
 
 schema:
   fields:
@@ -69,7 +69,7 @@ schema:
       description: "Surrogate key: <MANDT>-<BUKRS>-<BELNR>-<GJAHR>. Primary key."
       nullable: false
       tags:
-        - urn: "urn:li:tag:field.primary_key"
+        - urn: "urn:li:tag:field__primary_key"
 
     - name: "company_code"
       type: STRING
@@ -131,7 +131,7 @@ schema:
       description: "Current status: OPEN | PAID | OVERDUE | DISPUTED | CANCELLED."
       nullable: false
       glossaryTerms:
-        - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+        - urn: "urn:li:glossaryTerm:finance__InvoiceStatus"
 
     - name: "vendor_id"
       type: STRING
@@ -163,7 +163,7 @@ schema:
       description: "Payment terms description (e.g., 'Net 30', '2/10 Net 30')."
       nullable: true
       glossaryTerms:
-        - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+        - urn: "urn:li:glossaryTerm:finance__PaymentTerms"
 
     - name: "amount_local_currency"
       type: DECIMAL
@@ -195,7 +195,7 @@ schema:
       description: "Days between posting_date and due_date (DPO metric)."
       nullable: true
       glossaryTerms:
-        - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+        - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
 
     - name: "cost_centre"
       type: STRING

@@ -61,7 +61,7 @@ Regulatory                           (GlossaryNode)
 ### Full term template
 
 ```yaml
-- urn: "urn:li:glossaryTerm:<domain>.<TermName>"
+- urn: "urn:li:glossaryTerm:<domain>__<TermName>"
   name: "<TermName>"                          # PascalCase, must be unique
   definition: |
     Clear, unambiguous definition of the term.
@@ -76,7 +76,7 @@ Regulatory                           (GlossaryNode)
     - type: STEWARD
       id: "urn:li:corpuser:<steward-username>"
   relatedTerms:                               # Optional — links to related terms
-    - urn: "urn:li:glossaryTerm:<domain>.<RelatedTerm>"
+    - urn: "urn:li:glossaryTerm:<domain>__<RelatedTerm>"
   customProperties:
     source: "<source of definition>"          # e.g., "IFRS IAS 37", "Internal Policy FIN-001"
     approved_by: "<approver name or team>"
@@ -95,7 +95,7 @@ Regulatory                           (GlossaryNode)
 | **No duplicates** | `validate.py` blocks duplicate names within and across files |
 | **No spaces** | Use CamelCase boundary, not spaces or underscores |
 | **Abbreviations** | Acronyms in caps: `PII`, `GDPR_DataSubject`, `SOX_InternalControl` |
-| **Domain prefix in URN** | `urn:li:glossaryTerm:finance.Invoice` — domain acts as namespace |
+| **Domain prefix in URN** | `urn:li:glossaryTerm:finance__Invoice` — use `__` (double underscore) as namespace separator; dots are reserved for DNS/IP/infra |
 
 ---
 
@@ -104,7 +104,7 @@ Regulatory                           (GlossaryNode)
 | Rule | Detail |
 |---|---|
 | Top-level nodes | Single PascalCase word: `Finance`, `Technical`, `Regulatory` |
-| Sub-nodes | Dot-separated PascalCase: `Finance.AccountsPayable` |
+| Sub-nodes | Double-underscore-separated PascalCase: `Finance__AccountsPayable` |
 | No deep nesting | Maximum 2 levels (node + sub-node) for discoverability |
 
 ---
@@ -169,15 +169,15 @@ When updating a definition:
 When a term is no longer in use:
 
 ```yaml
-- urn: "urn:li:glossaryTerm:finance.OldTerm"
+- urn: "urn:li:glossaryTerm:finance__OldTerm"
   name: "OldTerm"
   definition: |
     DEPRECATED: This term has been superseded by 'NewTerm'.
-    Please update any references to use urn:li:glossaryTerm:finance.NewTerm.
+    Please update any references to use urn:li:glossaryTerm:finance__NewTerm.
     Original definition: ...
   deprecated: true
-  deprecationNote: "Superseded by finance.NewTerm as of 2025-03-01"
-  replacedBy: "urn:li:glossaryTerm:finance.NewTerm"
+  deprecationNote: "Superseded by finance__NewTerm as of 2025-03-01"
+  replacedBy: "urn:li:glossaryTerm:finance__NewTerm"
 ```
 
 Do not delete the YAML entry — retain it for historical reference.
@@ -191,15 +191,15 @@ In dataset YAML files, link terms at both dataset and field level:
 ```yaml
 # Dataset-level glossary links
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.Invoice"
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance__Invoice"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
 
 # Field-level glossary links
 schema:
   fields:
     - name: "days_payable_outstanding"
       glossaryTerms:
-        - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+        - urn: "urn:li:glossaryTerm:finance__DaysPayableOutstanding"
 ```
 
 **Rules:**

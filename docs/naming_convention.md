@@ -9,8 +9,11 @@ All metadata artefacts must follow naming conventions enforced by `scripts/enfor
 ### Pattern
 
 ```
-<domain>.<subdomain>.<source>.<entity>.<layer>
+<domain>__<subdomain>__<source>__<entity>__<layer>
 ```
+
+Segments are separated by `__` (double underscore). Words within a segment use `_` (single underscore).
+**Dots and hyphens are forbidden** — they are reserved for DNS, IP, and infrastructure naming.
 
 ### Rules
 
@@ -22,31 +25,37 @@ All metadata artefacts must follow naming conventions enforced by `scripts/enfor
 | `entity` | snake_case | `invoice` | Business entity name |
 | `layer` | one of: `raw`, `bronze`, `silver`, `gold` | `silver` | Medallion layer |
 
-**snake_case rules:**
-- Lowercase letters only
-- Digits allowed (not as first character)
-- Underscores as word separators
-- No hyphens, spaces, or uppercase letters
+### File Naming Rule
+
+> **The YAML filename (without `.yaml`) must exactly match the `name` field inside the file.**
+
+```
+# File:  finance__accounts_payable__erp_sap__invoice__silver.yaml
+name: "finance__accounts_payable__erp_sap__invoice__silver"
+```
+
+`enforce_naming.py` enforces this with a hard error — mismatches block the PR.
 
 ### Valid Examples
 
-| Name | Domain | Layer | Notes |
+| Name / Filename (stem) | Domain | Layer | Notes |
 |---|---|---|---|
-| `finance.accounts_payable.erp_sap.invoice.raw` | finance | raw | ✅ |
-| `finance.accounts_payable.erp_sap.invoice.silver` | finance | silver | ✅ |
-| `marketing.campaigns.salesforce_mc.campaign_event.bronze` | marketing | bronze | ✅ |
-| `operations.orders.oracle_wms.shipment.gold` | operations | gold | ✅ |
-| `engineering.product_telemetry.kafka.page_view.silver` | engineering | silver | ✅ |
+| `finance__accounts_payable__erp_sap__invoice__raw` | finance | raw | ✅ |
+| `finance__accounts_payable__erp_sap__invoice__silver` | finance | silver | ✅ |
+| `marketing__campaigns__salesforce_mc__campaign_event__bronze` | marketing | bronze | ✅ |
+| `operations__orders__oracle_wms__shipment__gold` | operations | gold | ✅ |
+| `engineering__product_telemetry__kafka__page_view__silver` | engineering | silver | ✅ |
 
 ### Invalid Examples
 
 | Name | Problem |
 |---|---|
-| `Finance.AP.SAP.Invoice.RAW` | Uppercase not allowed |
-| `finance.ap.sap.invoice` | Missing layer component |
-| `finance-ap-sap-invoice-raw` | Hyphens not allowed; use dots as separators |
-| `finance.accounts payable.erp_sap.invoice.raw` | Spaces not allowed |
-| `finance.accounts_payable.erp_sap.invoice.platinum` | `platinum` is not a valid layer |
+| `Finance__AP__SAP__Invoice__RAW` | Uppercase not allowed |
+| `finance__ap__sap__invoice` | Missing layer component |
+| `finance-ap-sap-invoice-raw` | Hyphens not allowed; use `__` as separator |
+| `finance.accounts_payable.erp_sap.invoice.raw` | Dots not allowed; use `__` as separator |
+| `finance__accounts payable__erp_sap__invoice__raw` | Spaces not allowed |
+| `finance__accounts_payable__erp_sap__invoice__platinum` | `platinum` is not a valid layer |
 
 ---
 
@@ -101,14 +110,15 @@ urn:li:domain:<domain_name>
 
 **Rules:**
 - `<domain_name>` must be lowercase
-- Sub-domains use dot notation: `urn:li:domain:finance.accounts_payable`
+- Sub-domains use double underscore (`__`) notation: `urn:li:domain:finance__accounts_payable`
+- Dots are **not allowed** — they conflict with DNS and infrastructure naming
 
 ### Examples
 
 ```yaml
 urn: "urn:li:domain:finance"
-urn: "urn:li:domain:finance.accounts_payable"
-urn: "urn:li:domain:marketing.campaigns"
+urn: "urn:li:domain:finance__accounts_payable"
+urn: "urn:li:domain:marketing__campaigns"
 ```
 
 ---
@@ -178,15 +188,15 @@ SOX_InternalControl
 ### Glossary Term URN Pattern
 
 ```
-urn:li:glossaryTerm:<domain>.<TermName>
+urn:li:glossaryTerm:<domain>__<TermName>
 ```
 
 **Examples:**
 ```
-urn:li:glossaryTerm:finance.Invoice
-urn:li:glossaryTerm:finance.DaysPayableOutstanding
-urn:li:glossaryTerm:regulatory.PII
-urn:li:glossaryTerm:technical.MedallionArchitecture
+urn:li:glossaryTerm:finance__Invoice
+urn:li:glossaryTerm:finance__DaysPayableOutstanding
+urn:li:glossaryTerm:regulatory__PII
+urn:li:glossaryTerm:technical__MedallionArchitecture
 ```
 
 ---

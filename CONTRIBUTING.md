@@ -150,9 +150,9 @@ python scripts/check_owners.py --metadata-dir metadata/ --owners-registry metada
 ## How to Add a Glossary Term
 
 1. Choose the correct glossary file:
-   - Business concepts → `metadata/glossary/business-terms.yaml`
-   - Technical/engineering → `metadata/glossary/technical-terms.yaml`
-   - Regulatory/compliance → `metadata/glossary/regulatory-terms.yaml`
+    - Business concepts → `metadata/glossary/business_terms.yaml`
+    - Technical/engineering → `metadata/glossary/technical_terms.yaml`
+    - Regulatory/compliance → `metadata/glossary/regulatory_terms.yaml`
 
 2. Add a new term entry (no duplicate `name` values allowed — enforced by `validate.py`):
 
@@ -178,7 +178,7 @@ python scripts/check_owners.py --metadata-dir metadata/ --owners-registry metada
 
 ## How to Certify a Dataset
 
-See [`docs/certification-process.md`](docs/certification-process.md) for the full workflow.
+See [`docs/certification_process.md`](docs/certification_process.md) for the full workflow.
 
 **Summary:**
 1. Ensure all required fields for certification are present

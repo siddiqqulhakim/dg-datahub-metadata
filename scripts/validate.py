@@ -299,7 +299,7 @@ class MetadataValidator:
         schema = data.get("schema", {}) or {}
         for field in schema.get("fields", []):
             field_tags = [t.get("urn", "") for t in field.get("tags", [])]
-            if any("sensitivity.pii" in t or "pii." in t for t in field_tags):
+            if any("sensitivity__pii" in t or "pii__" in t for t in field_tags):
                 has_pii_fields = True
                 break
 

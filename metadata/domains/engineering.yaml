@@ -27,13 +27,13 @@ owners:
     source: MANUAL
 
 subDomains:
-  - urn: "urn:li:domain:engineering.product_telemetry"
+  - urn: "urn:li:domain:engineering__product_telemetry"
     name: "Product Telemetry"
     description: "Feature usage events, error rates, latency metrics."
-  - urn: "urn:li:domain:engineering.infrastructure"
+  - urn: "urn:li:domain:engineering__infrastructure"
     name: "Infrastructure"
     description: "Cloud cost, resource utilisation, SLA metrics."
-  - urn: "urn:li:domain:engineering.sdlc"
+  - urn: "urn:li:domain:engineering__sdlc"
     name: "Software Delivery"
     description: "DORA metrics, deployment frequency, change failure rate."
 

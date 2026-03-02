@@ -40,9 +40,10 @@ SNAKE_CASE_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 PASCAL_CASE_PATTERN = re.compile(r"^[A-Z][a-zA-Z0-9_]*$")
 VALID_LAYERS = {"raw", "bronze", "silver", "gold"}
 
-# Dataset name: <domain>.<subdomain>.<source>.<entity>.<layer>
+# Dataset name: <domain>__<subdomain>__<source>__<entity>__<layer>
+# Double underscore (__) is the cross-platform separator (dots are reserved for DNS/IP/infra).
 DATASET_NAME_PATTERN = re.compile(
-    r"^([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)$"
+    r"^([a-z][a-z0-9_]*)__([a-z][a-z0-9_]*)__([a-z][a-z0-9_]*)__([a-z][a-z0-9_]*)__([a-z][a-z0-9_]*)$"
 )
 
 # Dataset URN for Snowflake:
@@ -54,8 +55,8 @@ DATASET_URN_PATTERN = re.compile(
 # Data product name: dp_<domain>_<business_purpose>
 DATA_PRODUCT_NAME_PATTERN = re.compile(r"^dp_[a-z][a-z0-9_]*_[a-z][a-z0-9_]*$")
 
-# Domain URN: urn:li:domain:<name>
-DOMAIN_URN_PATTERN = re.compile(r"^urn:li:domain:[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$")
+# Domain URN: urn:li:domain:<name> — uses double underscore for subdomains (no dots)
+DOMAIN_URN_PATTERN = re.compile(r"^urn:li:domain:[a-z][a-z0-9_]*(__[a-z][a-z0-9_]*)*$")
 
 
 @dataclass
@@ -127,9 +128,9 @@ class NamingEnforcer:
         if not match:
             self.add_violation(
                 file_path, "name", name,
-                "Dataset name must follow pattern: <domain>.<subdomain>.<source>.<entity>.<layer>. "
-                "All components must be snake_case.",
-                suggestion=f"e.g., finance.accounts_payable.erp_sap.invoice.{layer}"
+                "Dataset name must follow pattern: <domain>__<subdomain>__<source>__<entity>__<layer>. "
+                "All components must be snake_case. Use double underscore (__) as separator (dots are reserved for DNS/IP/infra).",
+                suggestion=f"e.g., finance__accounts_payable__erp_sap__invoice__{layer}"
             )
         else:
             domain_, subdomain_, source_, entity_, name_layer = match.groups()
@@ -180,8 +181,9 @@ class NamingEnforcer:
             self.add_violation(
                 file_path, "urn", urn,
                 "Domain URN must match pattern: urn:li:domain:<lowercase_name>. "
-                "Name must be lowercase with underscores.",
-                suggestion=f"urn:li:domain:{name.lower().replace(' ', '_')}"
+                "Sub-domains use double underscore (__) as separator (e.g., finance__accounts_payable). "
+                "Dots are not allowed — they conflict with DNS/IP/infra naming.",
+                suggestion=f"urn:li:domain:{name.lower().replace(' ', '_').replace('.', '__')}"
             )
 
     def validate_data_product(self, file_path: str, data: dict):
@@ -216,38 +218,37 @@ class NamingEnforcer:
         for node in data.get("nodes", []):
             name = node.get("name", "")
             if name:
-                # Node names follow pattern: Category or Category.Subcategory
-                parts = name.split(".")
+                # Node names follow pattern: Category or Category__Subcategory
+                # Use double underscore as separator (dots are reserved for DNS/IP/infra)
+                parts = re.split(r"__", name)
                 for part in parts:
                     if not re.match(r"^[A-Z][a-zA-Z0-9]*$", part):
                         self.add_violation(
                             file_path, f"nodes[].name part ('{part}')", name,
-                            "Glossary node name parts must start with uppercase (e.g., Finance or Finance.AccountsPayable)."
+                            "Glossary node name parts must start with uppercase. "
+                            "Use double underscore (__) as separator (e.g., Finance or Finance__AccountsPayable)."
                         )
 
     def validate_file_name_consistency(self, file_path: Path, data: dict):
-        """Check that the file name reflects the internal 'name' field."""
+        """Enforce that the filename stem exactly matches the internal 'name' field.
+
+        Rule: <name>.yaml  ←→  name: "<name>"
+        Dots and hyphens are forbidden — use double underscores (__) as segment
+        separators and single underscores as word separators within a segment.
+        """
         internal_name = data.get("name", "")
         if not internal_name:
             return
 
-        # Normalise both to compare (replace dots and hyphens with underscores)
-        file_stem = file_path.stem.lower()
-        normalised_name = internal_name.lower().replace(".", "_").replace("-", "_")
+        file_stem = file_path.stem   # filename without .yaml, case-preserved
 
-        # For datasets: file stem should be a simplified version of the name
-        # This is a soft check — we warn but don't hard fail
-        if data.get("kind") == "dataset" or "metadata/datasets/" in str(file_path).replace("\\", "/"):
-            # Allow file name to be a subset of the full name (common pattern)
-            name_parts = internal_name.split(".")
-            if name_parts:
-                domain_part = name_parts[0].lower()
-                if domain_part not in file_stem:
-                    self.add_violation(
-                        str(file_path), "filename", file_path.name,
-                        f"File name should include the domain prefix '{domain_part}' for easy identification.",
-                        suggestion=f"e.g., {domain_part}_{file_path.stem}.yaml"
-                    )
+        if file_stem != internal_name:
+            self.add_violation(
+                str(file_path), "filename", file_path.name,
+                f"File name must exactly match the internal 'name' field. "
+                f"Expected filename: '{internal_name}.yaml', got: '{file_path.name}'.",
+                suggestion=f"Rename the file to: {internal_name}.yaml"
+            )
 
     def validate_file(self, file_path: Path):
         """Validate naming in a single YAML file."""

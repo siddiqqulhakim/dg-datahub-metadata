@@ -17,16 +17,16 @@ nodes:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
 
-  - urn: "urn:li:glossaryNode:Regulatory.Privacy"
-    name: "Regulatory.Privacy"
+  - urn: "urn:li:glossaryNode:Regulatory__Privacy"
+    name: "Regulatory__Privacy"
     parentNode: "urn:li:glossaryNode:Regulatory"
     description: "Data privacy and PII-related regulatory terms."
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
 
-  - urn: "urn:li:glossaryNode:Regulatory.Financial"
-    name: "Regulatory.Financial"
+  - urn: "urn:li:glossaryNode:Regulatory__Financial"
+    name: "Regulatory__Financial"
     parentNode: "urn:li:glossaryNode:Regulatory"
     description: "Financial regulation terms (SOX, IFRS, Basel)."
     owners:
@@ -34,7 +34,7 @@ nodes:
         id: "urn:li:corpuser:john.smith"
 
 terms:
-  - urn: "urn:li:glossaryTerm:regulatory.PII"
+  - urn: "urn:li:glossaryTerm:regulatory__PII"
     name: "PII"
     definition: |
       Personally Identifiable Information (PII) is any information that can be
@@ -42,19 +42,19 @@ terms:
       a specific individual. Under GDPR Article 4(1), this includes names, email
       addresses, phone numbers, IP addresses, location data, biometric data, and
       any other identifier specific to a natural person. All datasets containing
-      PII must carry the `sensitivity.pii` tag and must not be made available in
+      PII must carry the `sensitivity__pii` tag and must not be made available in
       raw form to non-authorised consumers.
-    parentNode: "urn:li:glossaryNode:Regulatory.Privacy"
+    parentNode: "urn:li:glossaryNode:Regulatory__Privacy"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
     customProperties:
       regulation: "GDPR,CCPA,LGPD"
       article: "GDPR Art. 4(1)"
-      required_tag: "sensitivity.pii"
+      required_tag: "sensitivity__pii"
       data_handling_policy: "PRIVACY-001"
 
-  - urn: "urn:li:glossaryTerm:regulatory.GDPR_DataSubject"
+  - urn: "urn:li:glossaryTerm:regulatory__GDPR_DataSubject"
     name: "GDPR_DataSubject"
     definition: |
       Under GDPR Article 4(1), a Data Subject is an identified or identifiable
@@ -63,7 +63,7 @@ terms:
       processing, data portability, and object to processing of their personal
       data. Systems processing data subjects' data must maintain records of
       processing activities (RoPA) under GDPR Article 30.
-    parentNode: "urn:li:glossaryNode:Regulatory.Privacy"
+    parentNode: "urn:li:glossaryNode:Regulatory__Privacy"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
@@ -72,7 +72,7 @@ terms:
       articles: "Art. 4(1), Art. 15-22, Art. 30"
       data_handling_policy: "PRIVACY-002"
 
-  - urn: "urn:li:glossaryTerm:regulatory.SOX_InternalControl"
+  - urn: "urn:li:glossaryTerm:regulatory__SOX_InternalControl"
     name: "SOX_InternalControl"
     definition: |
       Under the Sarbanes-Oxley Act (SOX) Section 404, companies must establish
@@ -81,18 +81,18 @@ terms:
       ensuring segregation of duties, documenting data flows to financial
       statements, and annually attesting to the effectiveness of these controls.
       All datasets contributing to financial statements must be tagged with
-      `compliance.sox` and have documented lineage to source systems.
-    parentNode: "urn:li:glossaryNode:Regulatory.Financial"
+      `compliance__sox` and have documented lineage to source systems.
+    parentNode: "urn:li:glossaryNode:Regulatory__Financial"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:john.smith"
     customProperties:
       regulation: "SOX"
       section: "Section 302, Section 404"
-      required_tag: "compliance.sox"
+      required_tag: "compliance__sox"
       data_handling_policy: "FIN-COMPLIANCE-001"
 
-  - urn: "urn:li:glossaryTerm:regulatory.DataRetentionPolicy"
+  - urn: "urn:li:glossaryTerm:regulatory__DataRetentionPolicy"
     name: "DataRetentionPolicy"
     definition: |
       A data retention policy defines how long data must be kept before it

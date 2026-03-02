@@ -16,7 +16,7 @@ version: "1"
 kind: dataset
 
 urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.bronze_finance.ap_invoice,PROD)"
-name: "finance.accounts_payable.erp_sap.invoice.bronze"
+name: "finance__accounts_payable__erp_sap__invoice__bronze"
 platform: "urn:li:dataPlatform:snowflake"
 
 description: |
@@ -33,7 +33,7 @@ description: |
   **NOT suitable for direct business consumption** — use silver layer.
 
 domain: "urn:li:domain:finance"
-subDomain: "urn:li:domain:finance.accounts_payable"
+subDomain: "urn:li:domain:finance__accounts_payable"
 
 owners:
   - type: DATAOWNER
@@ -48,16 +48,16 @@ owners:
 
 tags:
 tags:
-  - urn: "urn:li:tag:sensitivity.pii"
-  - urn: "urn:li:tag:sensitivity.financial"
-  - urn: "urn:li:tag:layer.bronze"
-  - urn: "urn:li:tag:source.sap_erp"
-  - urn: "urn:li:tag:pii.hashed"
+  - urn: "urn:li:tag:sensitivity__pii"
+  - urn: "urn:li:tag:sensitivity__financial"
+  - urn: "urn:li:tag:layer__bronze"
+  - urn: "urn:li:tag:source__sap_erp"
+  - urn: "urn:li:tag:pii__hashed"
 
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.Invoice"
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-  - urn: "urn:li:glossaryTerm:technical.DataQualityScore"
+  - urn: "urn:li:glossaryTerm:finance__Invoice"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+  - urn: "urn:li:glossaryTerm:technical__DataQualityScore"
 
 schema:
   fields:
@@ -127,7 +127,7 @@ schema:
       description: "SHA-256 hash of vendor email. Original PII masked."
       nullable: true
       tags:
-        - urn: "urn:li:tag:pii.hashed"
+        - urn: "urn:li:tag:pii__hashed"
 
     - name: "VENDOR_PHONE_HASH"
       type: STRING
@@ -135,7 +135,7 @@ schema:
       description: "SHA-256 hash of vendor phone. Original PII masked."
       nullable: true
       tags:
-        - urn: "urn:li:tag:pii.hashed"
+        - urn: "urn:li:tag:pii__hashed"
 
     - name: "_DATA_QUALITY_SCORE"
       type: INTEGER

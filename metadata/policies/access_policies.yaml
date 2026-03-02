@@ -133,7 +133,7 @@ policies:
     resources:
       resourceType: DATASET
       filter:
-        tag: "urn:li:tag:layer.raw"
+        tag: "urn:li:tag:layer__raw"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
@@ -160,7 +160,7 @@ policies:
     resources:
       resourceType: DATASET
       filter:
-        tag: "urn:li:tag:sensitivity.pii"
+        tag: "urn:li:tag:sensitivity__pii"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:compliance.lead"
@@ -187,7 +187,7 @@ policies:
     resources:
       resourceType: DATASET
       filter:
-        tag: "urn:li:tag:layer.gold"
+        tag: "urn:li:tag:layer__gold"
     owners:
       - type: STEWARD
         id: "urn:li:corpuser:carlos.rodriguez"

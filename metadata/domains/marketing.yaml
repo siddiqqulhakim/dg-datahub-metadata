@@ -27,16 +27,16 @@ owners:
     source: MANUAL
 
 subDomains:
-  - urn: "urn:li:domain:marketing.campaigns"
+  - urn: "urn:li:domain:marketing__campaigns"
     name: "Campaigns"
     description: "Paid, owned, and earned campaign performance data."
-  - urn: "urn:li:domain:marketing.customer_acquisition"
+  - urn: "urn:li:domain:marketing__customer_acquisition"
     name: "Customer Acquisition"
     description: "Lead generation, conversion funnels, CAC analysis."
-  - urn: "urn:li:domain:marketing.attribution"
+  - urn: "urn:li:domain:marketing__attribution"
     name: "Attribution"
     description: "Multi-touch attribution models, channel mix."
-  - urn: "urn:li:domain:marketing.customer_journey"
+  - urn: "urn:li:domain:marketing__customer_journey"
     name: "Customer Journey"
     description: "Touchpoint sequences, session data, engagement scores."
 

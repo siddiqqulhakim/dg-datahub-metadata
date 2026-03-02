@@ -16,7 +16,7 @@ version: "1"
 kind: dataset
 
 urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.raw_finance.ap_invoice,PROD)"
-name: "finance.accounts_payable.erp_sap.invoice.raw"
+name: "finance__accounts_payable__erp_sap__invoice__raw"
 platform: "urn:li:dataPlatform:snowflake"
 
 description: |
@@ -33,7 +33,7 @@ description: |
   **SLA:** Data available by 04:00 UTC each day
 
 domain: "urn:li:domain:finance"
-subDomain: "urn:li:domain:finance.accounts_payable"
+subDomain: "urn:li:domain:finance__accounts_payable"
 
 owners:
   - type: DATAOWNER
@@ -47,16 +47,16 @@ owners:
     source: MANUAL
 
 tags:
-  - urn: "urn:li:tag:sensitivity.pii"       # Vendor contact details present
-  - urn: "urn:li:tag:sensitivity.financial"
-  - urn: "urn:li:tag:layer.raw"
-  - urn: "urn:li:tag:source.sap_erp"
-  - urn: "urn:li:tag:ingestion.full_load"
+  - urn: "urn:li:tag:sensitivity__pii"       # Vendor contact details present
+  - urn: "urn:li:tag:sensitivity__financial"
+  - urn: "urn:li:tag:layer__raw"
+  - urn: "urn:li:tag:source__sap_erp"
+  - urn: "urn:li:tag:ingestion__full_load"
 
 glossaryTerms:
-  - urn: "urn:li:glossaryTerm:finance.Invoice"
-  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
-  - urn: "urn:li:glossaryTerm:regulatory.PII"
+  - urn: "urn:li:glossaryTerm:finance__Invoice"
+  - urn: "urn:li:glossaryTerm:finance__AccountsPayable"
+  - urn: "urn:li:glossaryTerm:regulatory__PII"
 
 schema:
   fields:
@@ -66,7 +66,7 @@ schema:
       description: "SAP Client/Tenant identifier."
       nullable: false
       tags:
-        - urn: "urn:li:tag:field.partition_key"
+        - urn: "urn:li:tag:field__partition_key"
 
     - name: "BUKRS"
       type: STRING
@@ -128,8 +128,8 @@ schema:
       description: "Vendor contact email address — PII field."
       nullable: true
       tags:
-        - urn: "urn:li:tag:sensitivity.pii"
-        - urn: "urn:li:tag:pii.email"
+        - urn: "urn:li:tag:sensitivity__pii"
+        - urn: "urn:li:tag:pii__email"
 
     - name: "VENDOR_PHONE"
       type: STRING
@@ -137,8 +137,8 @@ schema:
       description: "Vendor contact phone number — PII field."
       nullable: true
       tags:
-        - urn: "urn:li:tag:sensitivity.pii"
-        - urn: "urn:li:tag:pii.phone_number"
+        - urn: "urn:li:tag:sensitivity__pii"
+        - urn: "urn:li:tag:pii__phone_number"
 
     - name: "_EXTRACTION_TIMESTAMP"
       type: TIMESTAMP
