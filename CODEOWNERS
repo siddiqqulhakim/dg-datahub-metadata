@@ -1,0 +1,25 @@
+# Governance team owns all metadata changes — mandatory reviewers on every PR
+metadata/               @data-platform/governance-team
+scripts/                @data-platform/governance-team
+.github/workflows/      @data-platform/platform-engineering
+environments/           @data-platform/platform-engineering
+ingestion/              @data-platform/platform-engineering
+
+# Domain-specific ownership
+metadata/domains/finance/       @data-platform/governance-team @finance/data-stewards
+metadata/domains/marketing/     @data-platform/governance-team @marketing/data-stewards
+metadata/domains/engineering/   @data-platform/governance-team @engineering/data-stewards
+metadata/domains/hr/            @data-platform/governance-team @hr/data-stewards
+metadata/domains/operations/    @data-platform/governance-team @operations/data-stewards
+
+# Gold datasets require additional sign-off
+metadata/datasets/gold/         @data-platform/governance-team @data-platform/data-certification-board
+
+# Policies require security team review
+metadata/policies/              @data-platform/governance-team @security/data-security-team
+
+# Documentation
+docs/                           @data-platform/governance-team
+README.md                       @data-platform/governance-team
+CONTRIBUTING.md                 @data-platform/governance-team
+

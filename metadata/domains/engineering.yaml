@@ -1,0 +1,50 @@
+---
+# ============================================================
+# Domain: Engineering
+# ============================================================
+version: "1"
+kind: domain
+
+urn: "urn:li:domain:engineering"
+name: "Engineering"
+description: |
+  The Engineering domain encompasses all data assets related to product telemetry,
+  platform observability, application events, infrastructure metrics, and
+  software delivery performance (DORA metrics).
+
+  **Data types:** Event streams, Metrics, Logs, CICD telemetry
+  **Upstream systems:** Kafka, Datadog, PagerDuty, GitHub, Jira, Snowplow
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:carlos.rodriguez"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:diana.lee"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:platform-data-engineering"
+    source: MANUAL
+
+subDomains:
+  - urn: "urn:li:domain:engineering.product_telemetry"
+    name: "Product Telemetry"
+    description: "Feature usage events, error rates, latency metrics."
+  - urn: "urn:li:domain:engineering.infrastructure"
+    name: "Infrastructure"
+    description: "Cloud cost, resource utilisation, SLA metrics."
+  - urn: "urn:li:domain:engineering.sdlc"
+    name: "Software Delivery"
+    description: "DORA metrics, deployment frequency, change failure rate."
+
+customProperties:
+  domain_lead: "carlos.rodriguez"
+  business_unit: "Technology & Engineering"
+  cost_center: "CC-3003"
+  data_classification: "INTERNAL"
+  review_cycle: "semi-annual"
+  compliance_frameworks: "SOC2"
+  primary_source_systems: "Kafka,Snowplow,GitHub,Datadog"
+  created_date: "2024-02-01"
+  last_reviewed_date: "2025-01-10"
+

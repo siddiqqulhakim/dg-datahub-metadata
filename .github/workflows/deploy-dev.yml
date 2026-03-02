@@ -1,0 +1,191 @@
+# ============================================================
+# deploy-dev.yml
+#
+# Purpose: Automatically deploy all metadata changes to the
+#          Development DataHub instance when a PR is merged
+#          into the `develop` branch.
+#
+# Deployment strategy:
+#   1. Load dev environment configuration
+#   2. Run ingestion recipes (source connectors)
+#   3. Upsert all metadata YAMLs via datahub CLI
+#   4. Post deployment summary
+#
+# Secrets required (Repository Secrets):
+#   - DATAHUB_TOKEN_DEV: DataHub personal access token for dev
+# ============================================================
+
+name: Deploy to Dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "metadata/**"
+      - "ingestion/sources/**"
+      - "environments/dev/**"
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy-dev:
+    name: "Deploy Metadata → Dev DataHub"
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ── Setup ──────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── Load environment config ─────────────────────────────
+      - name: Load dev environment variables
+        run: |
+          set -a
+          source environments/dev/config.env
+          set +a
+          echo "DATAHUB_GMS_URL=${DATAHUB_GMS_URL}" >> $GITHUB_ENV
+          echo "DATAHUB_ENV=${DATAHUB_ENV}" >> $GITHUB_ENV
+          echo "METADATA_DIR=${METADATA_DIR}" >> $GITHUB_ENV
+
+      # ── Pre-flight validation (safety net) ─────────────────
+      - name: Run pre-deployment validation
+        run: |
+          python scripts/validate.py --metadata-dir metadata/
+          python scripts/enforce_naming.py --metadata-dir metadata/
+          python scripts/check_owners.py \
+            --metadata-dir metadata/ \
+            --owners-registry metadata/ownership/owners.yaml
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      # ── Configure DataHub CLI ───────────────────────────────
+      - name: Configure DataHub CLI
+        run: |
+          datahub init
+          cat > ~/.datahubenv << EOF
+          gms:
+            server: "${DATAHUB_GMS_URL}"
+            token: "${DATAHUB_TOKEN}"
+          EOF
+        env:
+          DATAHUB_TOKEN: ${{ secrets.DATAHUB_TOKEN_DEV }}
+
+      # ── Deploy Domains ──────────────────────────────────────
+      - name: Deploy Domains
+        run: |
+          echo "🚀 Deploying domains to Dev..."
+          for f in metadata/domains/*.yaml; do
+            echo "  → ${f}"
+            datahub put --aspectName domainProperties \
+              --file "${f}" || echo "::warning file=${f}::Domain deploy returned non-zero"
+          done
+
+      # ── Deploy Tags ─────────────────────────────────────────
+      - name: Deploy Tags
+        run: |
+          echo "🚀 Deploying tags to Dev..."
+          datahub put --file metadata/tags/tags.yaml 2>&1 || true
+
+      # ── Deploy Glossary ─────────────────────────────────────
+      - name: Deploy Glossary
+        run: |
+          echo "🚀 Deploying glossary to Dev..."
+          for f in metadata/glossary/*.yaml; do
+            echo "  → ${f}"
+            datahub put --file "${f}" 2>&1 || \
+              echo "::warning file=${f}::Glossary deploy returned non-zero"
+          done
+
+      # ── Deploy Ownership ────────────────────────────────────
+      - name: Deploy Ownership Registry
+        run: |
+          echo "🚀 Deploying ownership to Dev..."
+          datahub put --file metadata/ownership/owners.yaml 2>&1 || true
+
+      # ── Deploy Datasets ─────────────────────────────────────
+      - name: Deploy Datasets (all layers)
+        run: |
+          echo "🚀 Deploying datasets to Dev..."
+          for layer in raw bronze silver gold; do
+            for f in metadata/datasets/${layer}/*.yaml; do
+              [ -f "${f}" ] || continue
+              echo "  → [${layer}] ${f}"
+              datahub put --file "${f}" 2>&1 || \
+                echo "::warning file=${f}::Dataset deploy returned non-zero"
+            done
+          done
+
+      # ── Deploy Policies ─────────────────────────────────────
+      - name: Deploy Policies
+        run: |
+          echo "🚀 Deploying policies to Dev..."
+          for f in metadata/policies/*.yaml; do
+            [ -f "${f}" ] || continue
+            echo "  → ${f}"
+            datahub put --file "${f}" 2>&1 || \
+              echo "::warning file=${f}::Policy deploy returned non-zero"
+          done
+
+      # ── Deploy Data Products ────────────────────────────────
+      - name: Deploy Data Products
+        run: |
+          echo "🚀 Deploying data products to Dev..."
+          for f in metadata/data-products/*.yaml; do
+            [ -f "${f}" ] || continue
+            echo "  → ${f}"
+            datahub put --file "${f}" 2>&1 || \
+              echo "::warning file=${f}::Data product deploy returned non-zero"
+          done
+
+      # ── Run Ingestion Recipes ───────────────────────────────
+      - name: Run Dev Ingestion Recipes
+        run: |
+          echo "🚀 Running dev ingestion recipes..."
+          for recipe in ingestion/sources/*-dev.yaml; do
+            [ -f "${recipe}" ] || continue
+            echo "  → ${recipe}"
+            datahub ingest -c "${recipe}" 2>&1 || \
+              echo "::warning file=${recipe}::Ingestion returned non-zero"
+          done
+        env:
+          DATAHUB_GMS_URL: ${{ env.DATAHUB_GMS_URL }}
+          DATAHUB_GMS_TOKEN: ${{ secrets.DATAHUB_TOKEN_DEV }}
+
+      # ── Deployment Summary ──────────────────────────────────
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## Dev Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artefact Type | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Domains | $(ls metadata/domains/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tags | $(ls metadata/tags/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Glossary Files | $(ls metadata/glossary/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Datasets (raw) | $(ls metadata/datasets/raw/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Datasets (bronze) | $(ls metadata/datasets/bronze/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Datasets (silver) | $(ls metadata/datasets/silver/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Datasets (gold) | $(ls metadata/datasets/gold/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Data Products | $(ls metadata/data-products/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Policies | $(ls metadata/policies/*.yaml 2>/dev/null | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** \`dev\`" >> $GITHUB_STEP_SUMMARY
+          echo "**DataHub GMS:** \`${DATAHUB_GMS_URL}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+

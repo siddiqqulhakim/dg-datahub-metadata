@@ -1,0 +1,96 @@
+# ============================================================
+# DataHub Ingestion Recipe: dbt — Production
+# ============================================================
+# Ingests dbt project metadata into DataHub:
+#   - dbt models as DataHub datasets
+#   - Column-level lineage from dbt manifest
+#   - dbt test results as DataHub assertions
+#   - dbt descriptions as DataHub descriptions
+#   - Model owners from dbt meta block
+#
+# Environment variables required:
+#   DBT_MANIFEST_PATH    (S3 or local path to manifest.json)
+#   DBT_CATALOG_PATH     (S3 or local path to catalog.json)
+#   DBT_RUN_RESULTS_PATH (S3 or local path to run_results.json)
+#   DATAHUB_GMS_URL
+#   DATAHUB_GMS_TOKEN
+# ============================================================
+
+source:
+  type: dbt
+  config:
+    manifest_path: "${DBT_MANIFEST_PATH}"
+    catalog_path: "${DBT_CATALOG_PATH}"
+    run_results_path: "${DBT_RUN_RESULTS_PATH}"
+
+    # ── Target platform (Snowflake in this case) ─────────────
+    target_platform: "snowflake"
+    platform_instance: "prod"
+    target_platform_instance: "prod"
+
+    # ── Which node types to ingest ───────────────────────────
+    node_type_pattern:
+      allow:
+        - "model"
+        - "source"
+        - "seed"
+        - "snapshot"
+      deny:
+        - "test"     # Tests ingested separately as assertions
+
+    # ── Model pattern ────────────────────────────────────────
+    entities_enabled:
+      models: "YES"
+      sources: "YES"
+      seeds: "YES"
+      snapshots: "YES"
+      test_results: "YES"
+
+    # ── Column lineage ───────────────────────────────────────
+    include_column_lineage: true
+
+    # ── Tag and owner mapping from dbt meta ──────────────────
+    tag_prefix: "dbt:"
+    enable_meta_mapping: true
+    meta_mapping:
+      owner:
+        match: "owner"
+        operation: "add_owner"
+        config:
+          owner_type: TECHNICAL_OWNER
+      data_owner:
+        match: "data_owner"
+        operation: "add_owner"
+        config:
+          owner_type: DATAOWNER
+      steward:
+        match: "steward"
+        operation: "add_owner"
+        config:
+          owner_type: STEWARD
+      domain:
+        match: "domain"
+        operation: "add_domain"
+      tags:
+        match: "tags"
+        operation: "add_tag"
+
+    # ── Environment ──────────────────────────────────────────
+    environment: "PROD"
+
+    # ── Stateful ingestion ───────────────────────────────────
+    stateful_ingestion:
+      enabled: true
+      remove_stale_metadata: true
+      fail_safe_threshold: 20.0
+
+sink:
+  type: datahub-rest
+  config:
+    server: "${DATAHUB_GMS_URL}"
+    token: "${DATAHUB_GMS_TOKEN}"
+    max_threads: 3
+    retry_max_attempts: 5
+
+pipeline_name: "dbt-prod-ingestion"
+

@@ -1,0 +1,65 @@
+---
+# ============================================================
+# Domain: Finance
+# ============================================================
+# This file defines the Finance domain in DataHub.
+# All datasets, glossary terms, and data products that are
+# owned by the Finance department should reference this domain URN.
+#
+# URN: urn:li:domain:finance
+# Naming pattern for datasets in this domain:
+#   finance.<subdomain>.<source>.<entity>.<layer>
+# ============================================================
+
+version: "1"
+kind: domain
+
+urn: "urn:li:domain:finance"
+name: "Finance"
+description: |
+  The Finance domain encompasses all data assets owned and managed by the Finance
+  department. This includes accounts payable, accounts receivable, general ledger,
+  treasury, financial reporting, revenue recognition, and regulatory compliance data.
+
+  **Data types:** Transactional, Reporting, Regulatory filings
+  **Upstream systems:** SAP ERP, Oracle Financials, Bloomberg Terminal, Workday
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+subDomains:
+  - urn: "urn:li:domain:finance.accounts_payable"
+    name: "Accounts Payable"
+    description: "Invoices, supplier payments, vendor management data."
+  - urn: "urn:li:domain:finance.accounts_receivable"
+    name: "Accounts Receivable"
+    description: "Customer invoices, receipts, aging reports."
+  - urn: "urn:li:domain:finance.general_ledger"
+    name: "General Ledger"
+    description: "Chart of accounts, journal entries, period close data."
+  - urn: "urn:li:domain:finance.treasury"
+    name: "Treasury"
+    description: "Cash management, FX positions, liquidity forecasting."
+  - urn: "urn:li:domain:finance.regulatory"
+    name: "Regulatory Reporting"
+    description: "IFRS, GAAP, SOX compliance and regulatory filing data."
+
+customProperties:
+  domain_lead: "john.smith"
+  business_unit: "Finance & Accounting"
+  cost_center: "CC-1001"
+  data_classification: "CONFIDENTIAL"
+  review_cycle: "quarterly"
+  compliance_frameworks: "SOX,IFRS,GDPR"
+  primary_source_systems: "SAP_ERP,Oracle_Financials"
+  created_date: "2024-01-15"
+  last_reviewed_date: "2025-01-10"
+

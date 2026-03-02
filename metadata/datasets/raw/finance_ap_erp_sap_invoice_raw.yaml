@@ -1,0 +1,187 @@
+---
+# ============================================================
+# Dataset: finance.accounts_payable.erp_sap.invoice.raw
+# Layer:   RAW  (source-aligned, no transformations applied)
+# ============================================================
+# This is the raw extraction of the SAP ERP AP_INVOICE table.
+# Data is landed as-is from the source system.
+# No PII cleansing or masking has been applied.
+#
+# Naming convention:
+#   <domain>.<subdomain>.<source>.<entity>.<layer>
+#   finance.accounts_payable.erp_sap.invoice.raw
+# ============================================================
+
+version: "1"
+kind: dataset
+
+urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.raw_finance.ap_invoice,PROD)"
+name: "finance.accounts_payable.erp_sap.invoice.raw"
+platform: "urn:li:dataPlatform:snowflake"
+
+description: |
+  Raw extraction of the Accounts Payable invoice table from SAP ERP (S/4HANA).
+  Contains all invoice header records extracted via full-load daily at 02:00 UTC.
+  Data is unmodified from source — no cleansing, deduplication, or masking applied.
+
+  **WARNING**: This dataset contains PII (vendor contact details) and must not
+  be used directly in reporting. Consume the silver layer instead.
+
+  **Source system:** SAP S/4HANA (ECC 6.0 compatible)
+  **Source table:** SAP.BKPF + SAP.BSEG (joined via extraction job)
+  **Extraction method:** Full load via JDBC connector
+  **SLA:** Data available by 04:00 UTC each day
+
+domain: "urn:li:domain:finance"
+subDomain: "urn:li:domain:finance.accounts_payable"
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+tags:
+  - urn: "urn:li:tag:sensitivity.pii"       # Vendor contact details present
+  - urn: "urn:li:tag:sensitivity.financial"
+  - urn: "urn:li:tag:layer.raw"
+  - urn: "urn:li:tag:source.sap_erp"
+  - urn: "urn:li:tag:ingestion.full_load"
+
+glossaryTerms:
+  - urn: "urn:li:glossaryTerm:finance.Invoice"
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:regulatory.PII"
+
+schema:
+  fields:
+    - name: "MANDT"
+      type: STRING
+      nativeDataType: "VARCHAR(3)"
+      description: "SAP Client/Tenant identifier."
+      nullable: false
+      tags:
+        - urn: "urn:li:tag:field.partition_key"
+
+    - name: "BUKRS"
+      type: STRING
+      nativeDataType: "VARCHAR(4)"
+      description: "Company code. Maps to legal entity in the chart of accounts."
+      nullable: false
+
+    - name: "BELNR"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Accounting document number. Primary key of the document."
+      nullable: false
+
+    - name: "GJAHR"
+      type: INTEGER
+      nativeDataType: "DECIMAL(4,0)"
+      description: "Fiscal year of the posting."
+      nullable: false
+
+    - name: "BLDAT"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Document date (date on the invoice from vendor)."
+      nullable: true
+
+    - name: "BUDAT"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Posting date (date the entry was posted in the system)."
+      nullable: false
+
+    - name: "BLART"
+      type: STRING
+      nativeDataType: "VARCHAR(2)"
+      description: "Document type code (e.g., KR=Vendor Invoice, ZP=Payment)."
+      nullable: false
+
+    - name: "LIFNR"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Vendor account number. Join to vendor master data."
+      nullable: true
+
+    - name: "DMBTR"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(13,2)"
+      description: "Amount in local currency."
+      nullable: true
+
+    - name: "WAERS"
+      type: STRING
+      nativeDataType: "VARCHAR(5)"
+      description: "Currency key (ISO 4217)."
+      nullable: true
+
+    - name: "VENDOR_EMAIL"
+      type: STRING
+      nativeDataType: "VARCHAR(241)"
+      description: "Vendor contact email address — PII field."
+      nullable: true
+      tags:
+        - urn: "urn:li:tag:sensitivity.pii"
+        - urn: "urn:li:tag:pii.email"
+
+    - name: "VENDOR_PHONE"
+      type: STRING
+      nativeDataType: "VARCHAR(30)"
+      description: "Vendor contact phone number — PII field."
+      nullable: true
+      tags:
+        - urn: "urn:li:tag:sensitivity.pii"
+        - urn: "urn:li:tag:pii.phone_number"
+
+    - name: "_EXTRACTION_TIMESTAMP"
+      type: TIMESTAMP
+      nativeDataType: "TIMESTAMP_NTZ(9)"
+      description: "UTC timestamp when this row was extracted from SAP."
+      nullable: false
+
+    - name: "_SOURCE_SYSTEM"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Source system identifier. Always 'SAP_S4HANA_PROD'."
+      nullable: false
+
+    - name: "_LOAD_ID"
+      type: STRING
+      nativeDataType: "VARCHAR(64)"
+      description: "Unique identifier for the ingestion batch run."
+      nullable: false
+
+lineage:
+  upstreams:
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:sap_erp,BKPF,PROD)"
+      type: TRANSFORMED
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:sap_erp,BSEG,PROD)"
+      type: TRANSFORMED
+
+freshness:
+  schedule: "0 2 * * *"      # Daily at 02:00 UTC
+  expectedLatency: "PT2H"    # Expected within 2 hours
+  sla: "04:00 UTC"
+
+customProperties:
+  layer: "raw"
+  domain: "finance"
+  subdomain: "accounts_payable"
+  source_system: "SAP_S4HANA"
+  extraction_type: "full_load"
+  estimated_row_count: "5000000"
+  refresh_frequency: "daily"
+  retention_days: "365"
+  contains_pii: "true"
+  pii_fields: "VENDOR_EMAIL,VENDOR_PHONE"
+  downstream_layers: "bronze,silver"
+  created_date: "2024-03-01"
+  last_schema_change_date: "2025-01-15"
+

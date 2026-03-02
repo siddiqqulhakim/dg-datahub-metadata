@@ -1,0 +1,263 @@
+---
+# ============================================================
+# Dataset: finance.accounts_payable.erp_sap.invoice_summary.gold
+# Layer:   GOLD (certified, analytics-ready, SLA-backed aggregation)
+# ============================================================
+# Gold datasets MUST have:
+#   - certification block (status: CERTIFIED)
+#   - At least 2 owners (DATAOWNER + STEWARD)
+#   - At least 1 glossary term
+#   - Description > 100 characters
+#   - No PII (raw PII must be resolved in bronze/silver)
+#   - Full lineage
+#   - Freshness SLA
+# ============================================================
+
+version: "1"
+kind: dataset
+
+urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.gold_finance.ap_invoice_summary,PROD)"
+name: "finance.accounts_payable.erp_sap.invoice_summary.gold"
+platform: "urn:li:dataPlatform:snowflake"
+
+description: |
+  Certified gold-layer AP invoice summary providing monthly aggregated accounts
+  payable metrics by vendor, legal entity, cost centre, and invoice status.
+
+  This dataset is the authoritative source for:
+  - Executive AP aging reports
+  - Cash flow forecasting models
+  - Vendor payment performance dashboards
+  - CFO monthly close packs
+
+  **Grain:** One row per (fiscal_month, company_code, vendor_id, invoice_status, cost_centre)
+  **Metrics included:** total_invoice_count, total_amount_usd, avg_dpo, overdue_amount_usd
+  **Latency SLA:** Available by 08:30 UTC each day
+  **Consumer SLA:** 99.9% daily availability
+
+domain: "urn:li:domain:finance"
+subDomain: "urn:li:domain:finance.accounts_payable"
+
+# ── CERTIFICATION BLOCK (REQUIRED for Gold) ──────────────────
+certification:
+  status: "CERTIFIED"
+  certifiedBy: "urn:li:corpuser:mary.johnson"
+  certifiedDate: "2025-01-20"
+  certificationLevel: "GOLD"
+  certificationNotes: |
+    Certified by Finance Data Steward on 2025-01-20 after successful data quality
+    audit (DQ score ≥ 98 over 90-day period), lineage validation to SAP source,
+    and sign-off from Finance domain lead (john.smith) and CFO Office.
+  nextReviewDate: "2025-07-20"
+  approvedBy:
+    - "urn:li:corpuser:john.smith"
+    - "urn:li:corpuser:mary.johnson"
+    - "urn:li:corpGroup:data-certification-board"
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+tags:
+  - urn: "urn:li:tag:sensitivity.financial"
+  - urn: "urn:li:tag:layer.gold"
+  - urn: "urn:li:tag:certified"
+  - urn: "urn:li:tag:usage.analytics_ready"
+  - urn: "urn:li:tag:usage.executive_reporting"
+  - urn: "urn:li:tag:sla.high"
+
+glossaryTerms:
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+  - urn: "urn:li:glossaryTerm:finance.CashFlow"
+  - urn: "urn:li:glossaryTerm:technical.GoldDataset"
+
+schema:
+  fields:
+    - name: "summary_key"
+      type: STRING
+      nativeDataType: "VARCHAR(80)"
+      description: "Surrogate key: MD5(<fiscal_month>|<company_code>|<vendor_id>|<invoice_status>|<cost_centre>)."
+      nullable: false
+      tags:
+        - urn: "urn:li:tag:field.primary_key"
+
+    - name: "fiscal_month"
+      type: STRING
+      nativeDataType: "VARCHAR(7)"
+      description: "Fiscal month in YYYY-MM format."
+      nullable: false
+      tags:
+        - urn: "urn:li:tag:field.partition_key"
+
+    - name: "fiscal_year"
+      type: INTEGER
+      nativeDataType: "SMALLINT"
+      description: "Fiscal year extracted from fiscal_month."
+      nullable: false
+
+    - name: "fiscal_quarter"
+      type: STRING
+      nativeDataType: "VARCHAR(6)"
+      description: "Fiscal quarter in YYYY-QN format (e.g., 2024-Q3)."
+      nullable: false
+
+    - name: "company_code"
+      type: STRING
+      nativeDataType: "VARCHAR(4)"
+      description: "SAP company code."
+      nullable: false
+
+    - name: "legal_entity_name"
+      type: STRING
+      nativeDataType: "VARCHAR(100)"
+      description: "Legal entity name."
+      nullable: false
+
+    - name: "legal_entity_region"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Geographic region of legal entity."
+      nullable: false
+
+    - name: "vendor_id"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Vendor account number."
+      nullable: true
+
+    - name: "vendor_name"
+      type: STRING
+      nativeDataType: "VARCHAR(100)"
+      description: "Vendor company name."
+      nullable: true
+
+    - name: "vendor_category"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Vendor category/segment."
+      nullable: true
+
+    - name: "vendor_country_code"
+      type: STRING
+      nativeDataType: "VARCHAR(2)"
+      description: "ISO 3166-1 alpha-2 country code."
+      nullable: true
+
+    - name: "cost_centre"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Cost centre code."
+      nullable: true
+
+    - name: "invoice_status"
+      type: STRING
+      nativeDataType: "VARCHAR(20)"
+      description: "Invoice status bucket: OPEN | PAID | OVERDUE | DISPUTED | CANCELLED."
+      nullable: false
+
+    - name: "invoice_count"
+      type: INTEGER
+      nativeDataType: "INTEGER"
+      description: "Number of invoices in this aggregation bucket."
+      nullable: false
+
+    - name: "total_amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(20,2)"
+      description: "Sum of invoice amounts converted to USD."
+      nullable: false
+
+    - name: "avg_amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Average invoice amount in USD."
+      nullable: true
+
+    - name: "min_amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Minimum invoice amount in USD."
+      nullable: true
+
+    - name: "max_amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Maximum invoice amount in USD."
+      nullable: true
+
+    - name: "avg_days_payable_outstanding"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(7,2)"
+      description: "Average DPO across all invoices in this bucket."
+      nullable: true
+      glossaryTerms:
+        - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+
+    - name: "overdue_invoice_count"
+      type: INTEGER
+      nativeDataType: "INTEGER"
+      description: "Count of overdue invoices in this bucket."
+      nullable: false
+
+    - name: "overdue_amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(20,2)"
+      description: "Total overdue amount in USD."
+      nullable: false
+
+    - name: "_aggregated_at"
+      type: TIMESTAMP
+      nativeDataType: "TIMESTAMP_NTZ(9)"
+      description: "UTC timestamp when this aggregate row was last computed."
+      nullable: false
+
+lineage:
+  upstreams:
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.silver_finance.ap_invoice,PROD)"
+      type: TRANSFORMED
+
+  transformationDescription: |
+    dbt model: models/gold/finance/gold_ap_invoice_summary.sql
+    Applied: monthly aggregation, DPO averaging, overdue bucketing
+
+freshness:
+  schedule: "30 8 * * *"
+  expectedLatency: "PT30M"
+  sla: "08:30 UTC"
+
+dataQuality:
+  lastAuditDate: "2025-01-18"
+  auditScore: 99.1
+  completenessScore: 99.8
+  uniquenessScore: 100.0
+  validityScore: 98.5
+  minExpectedRowsPerDay: 50000
+
+customProperties:
+  layer: "gold"
+  domain: "finance"
+  subdomain: "accounts_payable"
+  source_system: "SAP_S4HANA"
+  dbt_model: "gold_ap_invoice_summary"
+  dbt_project: "finance_gold"
+  estimated_row_count: "180000"
+  refresh_frequency: "daily"
+  retention_days: "2555"
+  contains_pii: "false"
+  approved_for_self_service: "true"
+  approved_for_executive_reporting: "true"
+  sla_tier: "P1"
+  downstream_tools: "Tableau,Power_BI,Jupyter,dbt_Semantic_Layer"
+  created_date: "2024-05-01"
+  last_certified_date: "2025-01-20"
+  last_schema_change_date: "2025-01-15"
+

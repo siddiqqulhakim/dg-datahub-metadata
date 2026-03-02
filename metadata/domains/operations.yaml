@@ -1,0 +1,53 @@
+---
+# ============================================================
+# Domain: Operations
+# ============================================================
+version: "1"
+kind: domain
+
+urn: "urn:li:domain:operations"
+name: "Operations"
+description: |
+  The Operations domain covers supply chain, logistics, warehouse management,
+  order fulfillment, returns, inventory, and vendor performance data.
+
+  **Data types:** Transactional, Operational, SLA, Inventory
+  **Upstream systems:** Oracle WMS, SAP SCM, Salesforce Service Cloud,
+  Manhattan Associates, Blue Yonder
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:emma.wilson"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:frank.brown"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:operations-data-engineering"
+    source: MANUAL
+
+subDomains:
+  - urn: "urn:li:domain:operations.orders"
+    name: "Orders"
+    description: "Order lifecycle from placement to delivery."
+  - urn: "urn:li:domain:operations.inventory"
+    name: "Inventory"
+    description: "Stock levels, movements, replenishment triggers."
+  - urn: "urn:li:domain:operations.logistics"
+    name: "Logistics"
+    description: "Shipment tracking, carrier performance, cost per shipment."
+  - urn: "urn:li:domain:operations.returns"
+    name: "Returns & Refunds"
+    description: "Return reasons, refund cycles, warranty claims."
+
+customProperties:
+  domain_lead: "emma.wilson"
+  business_unit: "Operations & Supply Chain"
+  cost_center: "CC-4004"
+  data_classification: "INTERNAL"
+  review_cycle: "quarterly"
+  compliance_frameworks: "ISO9001"
+  primary_source_systems: "SAP_SCM,Oracle_WMS,Salesforce_SC"
+  created_date: "2024-01-15"
+  last_reviewed_date: "2025-01-10"
+

@@ -1,0 +1,180 @@
+---
+# ============================================================
+# Ownership Registry
+# ============================================================
+# Central registry mapping GitHub usernames / team slugs to
+# DataHub user/group URNs. Used by check_owners.py to validate
+# that all owners referenced in dataset YAMLs are known,
+# active identities in the DataHub user directory.
+#
+# MAINTENANCE: Update this file when:
+#   - A new team member joins the data team
+#   - Someone changes role or leaves
+#   - A new GitHub team is created
+#
+# check_owners.py will FAIL if a dataset references an owner
+# URN that is not listed in this registry.
+# ============================================================
+
+version: "1"
+kind: ownership_registry
+
+# ── Individual Users ─────────────────────────────────────────
+users:
+  - urn: "urn:li:corpuser:john.smith"
+    github_username: "john-smith"
+    display_name: "John Smith"
+    email: "john.smith@company.com"
+    title: "Finance Domain Lead"
+    department: "Finance & Accounting"
+    active: true
+    roles:
+      - DATAOWNER
+      - STEWARD
+
+  - urn: "urn:li:corpuser:mary.johnson"
+    github_username: "mary-johnson"
+    display_name: "Mary Johnson"
+    email: "mary.johnson@company.com"
+    title: "Senior Data Steward — Finance"
+    department: "Finance & Accounting"
+    active: true
+    roles:
+      - STEWARD
+
+  - urn: "urn:li:corpuser:alice.chen"
+    github_username: "alice-chen"
+    display_name: "Alice Chen"
+    email: "alice.chen@company.com"
+    title: "Marketing Domain Lead"
+    department: "Marketing & Growth"
+    active: true
+    roles:
+      - DATAOWNER
+      - STEWARD
+
+  - urn: "urn:li:corpuser:bob.taylor"
+    github_username: "bob-taylor"
+    display_name: "Bob Taylor"
+    email: "bob.taylor@company.com"
+    title: "Senior Data Steward — Marketing"
+    department: "Marketing & Growth"
+    active: true
+    roles:
+      - STEWARD
+
+  - urn: "urn:li:corpuser:carlos.rodriguez"
+    github_username: "carlos-rodriguez"
+    display_name: "Carlos Rodriguez"
+    email: "carlos.rodriguez@company.com"
+    title: "Engineering Domain Lead / Principal Data Engineer"
+    department: "Technology & Engineering"
+    active: true
+    roles:
+      - DATAOWNER
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpuser:diana.lee"
+    github_username: "diana-lee"
+    display_name: "Diana Lee"
+    email: "diana.lee@company.com"
+    title: "Data Quality Lead"
+    department: "Data Platform"
+    active: true
+    roles:
+      - STEWARD
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpuser:emma.wilson"
+    github_username: "emma-wilson"
+    display_name: "Emma Wilson"
+    email: "emma.wilson@company.com"
+    title: "Operations Domain Lead"
+    department: "Operations & Supply Chain"
+    active: true
+    roles:
+      - DATAOWNER
+      - STEWARD
+
+  - urn: "urn:li:corpuser:frank.brown"
+    github_username: "frank-brown"
+    display_name: "Frank Brown"
+    email: "frank.brown@company.com"
+    title: "Senior Data Steward — Operations"
+    department: "Operations & Supply Chain"
+    active: true
+    roles:
+      - STEWARD
+
+  - urn: "urn:li:corpuser:compliance.lead"
+    github_username: "compliance-lead"
+    display_name: "Compliance Lead"
+    email: "dpo@company.com"
+    title: "Data Protection Officer / Compliance Lead"
+    department: "Legal & Compliance"
+    active: true
+    roles:
+      - STEWARD
+
+# ── Groups / Teams ───────────────────────────────────────────
+groups:
+  - urn: "urn:li:corpGroup:finance-data-engineering"
+    github_team: "finance/data-engineering"
+    display_name: "Finance Data Engineering"
+    description: "Engineers responsible for Finance domain data pipelines."
+    active: true
+    roles:
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpGroup:marketing-data-engineering"
+    github_team: "marketing/data-engineering"
+    display_name: "Marketing Data Engineering"
+    description: "Engineers responsible for Marketing domain data pipelines."
+    active: true
+    roles:
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpGroup:platform-data-engineering"
+    github_team: "data-platform/platform-engineering"
+    display_name: "Platform Data Engineering"
+    description: "Core platform team owning DataHub, Snowflake, dbt infrastructure."
+    active: true
+    roles:
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpGroup:operations-data-engineering"
+    github_team: "operations/data-engineering"
+    display_name: "Operations Data Engineering"
+    description: "Engineers responsible for Operations domain data pipelines."
+    active: true
+    roles:
+      - TECHNICAL_OWNER
+
+  - urn: "urn:li:corpGroup:data-certification-board"
+    github_team: "data-platform/data-certification-board"
+    display_name: "Data Certification Board"
+    description: "Cross-functional board responsible for certifying Gold datasets."
+    active: true
+    roles:
+      - STEWARD
+
+# ── Ownership Type Definitions ───────────────────────────────
+# Reference for check_owners.py validation rules
+ownership_rules:
+  required_per_dataset:
+    - type: DATAOWNER
+      minimum: 1
+      description: "Accountable business owner for the dataset."
+    - type: STEWARD
+      minimum: 1
+      description: "Operational data steward who manages day-to-day quality."
+  recommended_per_dataset:
+    - type: TECHNICAL_OWNER
+      description: "Engineering team or individual who maintains the pipeline."
+  gold_layer_additional_requirements:
+    - type: DATAOWNER
+      minimum: 1
+    - type: STEWARD
+      minimum: 1
+    - certificationBoard: "urn:li:corpGroup:data-certification-board"
+

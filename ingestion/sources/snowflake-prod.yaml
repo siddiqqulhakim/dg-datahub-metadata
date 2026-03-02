@@ -1,0 +1,101 @@
+# ============================================================
+# DataHub Ingestion Recipe: Snowflake — Production
+# ============================================================
+# Production recipe with tighter security: no sample values,
+# conservative profiling, strict error handling.
+#
+# Environment variables required:
+#   SNOWFLAKE_ACCOUNT_PROD
+#   SNOWFLAKE_USER_PROD
+#   SNOWFLAKE_PRIVATE_KEY_PATH   (key-pair auth — no password in prod)
+#   SNOWFLAKE_PRIVATE_KEY_PASSPHRASE
+#   SNOWFLAKE_WAREHOUSE_PROD
+#   DATAHUB_GMS_URL
+#   DATAHUB_GMS_TOKEN
+# ============================================================
+
+source:
+  type: snowflake
+  config:
+    account_id: "${SNOWFLAKE_ACCOUNT_PROD}"
+    username: "${SNOWFLAKE_USER_PROD}"
+    private_key_path: "${SNOWFLAKE_PRIVATE_KEY_PATH}"
+    private_key_passphrase: "${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE}"
+    warehouse: "${SNOWFLAKE_WAREHOUSE_PROD}"
+    role: "DATAHUB_READER_ROLE"
+
+    database_pattern:
+      allow:
+        - "^PROD_.*"
+        - "^REFERENCE$"
+      deny:
+        - "^INFORMATION_SCHEMA$"
+        - "^SNOWFLAKE$"
+        - "^SNOWFLAKE_SAMPLE_DATA$"
+
+    schema_pattern:
+      allow:
+        - "^RAW_.*"
+        - "^BRONZE_.*"
+        - "^SILVER_.*"
+        - "^GOLD_.*"
+        - "^REFERENCE$"
+      deny:
+        - "^INFORMATION_SCHEMA$"
+
+    table_pattern:
+      deny:
+        - ".*_BACKUP$"
+        - ".*_TMP$"
+        - ".*_TEMP$"
+        - ".*_STAGING$"
+
+    profiling:
+      enabled: true
+      profile_table_level_only: false
+      max_number_of_fields_to_profile: 30
+      include_field_null_count: true
+      include_field_min_value: true
+      include_field_max_value: true
+      include_field_mean_value: true
+      include_field_distinct_count: true
+      include_field_sample_values: false   # NEVER expose sample values in prod
+
+    include_table_lineage: true
+    include_view_lineage: true
+    include_column_lineage: true
+    use_queries_v2: true
+
+    include_usage_stats: true
+    bucket_duration: "DAY"
+    start_time: "-7d"
+
+    stateful_ingestion:
+      enabled: true
+      remove_stale_metadata: true
+      fail_safe_threshold: 20.0   # Stricter in prod — abort if >20% entities would be removed
+
+    platform_instance: "prod"
+
+    classification:
+      enabled: true
+      classifiers:
+        - type: datahub
+          config:
+            confidence_level_threshold: 0.8   # Higher confidence required in prod
+
+sink:
+  type: datahub-rest
+  config:
+    server: "${DATAHUB_GMS_URL}"
+    token: "${DATAHUB_GMS_TOKEN}"
+    max_threads: 3
+    retry_max_attempts: 5
+    retry_status_codes:
+      - 429
+      - 502
+      - 503
+      - 504
+
+pipeline_name: "snowflake-prod-ingestion"
+

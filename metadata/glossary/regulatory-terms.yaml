@@ -1,0 +1,111 @@
+---
+# ============================================================
+# Glossary: Regulatory Terms
+# ============================================================
+# Contains compliance and regulatory concepts.
+# Used to tag datasets that fall under specific regulations.
+# ============================================================
+
+version: "1"
+kind: glossary
+
+nodes:
+  - urn: "urn:li:glossaryNode:Regulatory"
+    name: "Regulatory"
+    description: "Terms related to data privacy, compliance, and regulatory requirements."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  - urn: "urn:li:glossaryNode:Regulatory.Privacy"
+    name: "Regulatory.Privacy"
+    parentNode: "urn:li:glossaryNode:Regulatory"
+    description: "Data privacy and PII-related regulatory terms."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  - urn: "urn:li:glossaryNode:Regulatory.Financial"
+    name: "Regulatory.Financial"
+    parentNode: "urn:li:glossaryNode:Regulatory"
+    description: "Financial regulation terms (SOX, IFRS, Basel)."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+
+terms:
+  - urn: "urn:li:glossaryTerm:regulatory.PII"
+    name: "PII"
+    definition: |
+      Personally Identifiable Information (PII) is any information that can be
+      used on its own or combined with other data to identify, contact, or locate
+      a specific individual. Under GDPR Article 4(1), this includes names, email
+      addresses, phone numbers, IP addresses, location data, biometric data, and
+      any other identifier specific to a natural person. All datasets containing
+      PII must carry the `sensitivity.pii` tag and must not be made available in
+      raw form to non-authorised consumers.
+    parentNode: "urn:li:glossaryNode:Regulatory.Privacy"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+    customProperties:
+      regulation: "GDPR,CCPA,LGPD"
+      article: "GDPR Art. 4(1)"
+      required_tag: "sensitivity.pii"
+      data_handling_policy: "PRIVACY-001"
+
+  - urn: "urn:li:glossaryTerm:regulatory.GDPR_DataSubject"
+    name: "GDPR_DataSubject"
+    definition: |
+      Under GDPR Article 4(1), a Data Subject is an identified or identifiable
+      natural person whose personal data is being processed. Data subjects have
+      the right to access, rectify, erase (right to be forgotten), restrict
+      processing, data portability, and object to processing of their personal
+      data. Systems processing data subjects' data must maintain records of
+      processing activities (RoPA) under GDPR Article 30.
+    parentNode: "urn:li:glossaryNode:Regulatory.Privacy"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+    customProperties:
+      regulation: "GDPR"
+      articles: "Art. 4(1), Art. 15-22, Art. 30"
+      data_handling_policy: "PRIVACY-002"
+
+  - urn: "urn:li:glossaryTerm:regulatory.SOX_InternalControl"
+    name: "SOX_InternalControl"
+    definition: |
+      Under the Sarbanes-Oxley Act (SOX) Section 404, companies must establish
+      and maintain internal controls over financial reporting. For data systems,
+      this means maintaining an audit trail of all changes to financial data,
+      ensuring segregation of duties, documenting data flows to financial
+      statements, and annually attesting to the effectiveness of these controls.
+      All datasets contributing to financial statements must be tagged with
+      `compliance.sox` and have documented lineage to source systems.
+    parentNode: "urn:li:glossaryNode:Regulatory.Financial"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+    customProperties:
+      regulation: "SOX"
+      section: "Section 302, Section 404"
+      required_tag: "compliance.sox"
+      data_handling_policy: "FIN-COMPLIANCE-001"
+
+  - urn: "urn:li:glossaryTerm:regulatory.DataRetentionPolicy"
+    name: "DataRetentionPolicy"
+    definition: |
+      A data retention policy defines how long data must be kept before it
+      is eligible for deletion. Retention periods are driven by regulatory
+      requirements and business need. Common requirements: Financial records
+      (7 years per most jurisdictions), HR records (7 years), Marketing
+      consent records (duration of consent + 3 years). All dataset YAML files
+      must specify `retention_days` in customProperties.
+    parentNode: "urn:li:glossaryNode:Regulatory"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+    customProperties:
+      policy_document: "DATA-RETENTION-POLICY-v3.pdf"
+      review_date: "2025-07-01"
+

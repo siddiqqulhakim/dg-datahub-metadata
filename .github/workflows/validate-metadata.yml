@@ -1,0 +1,224 @@
+# ============================================================
+# validate-metadata.yml
+#
+# Purpose: Run all metadata quality gates on every PR and push.
+#          This workflow MUST pass before any merge is allowed.
+#
+# Triggers:
+#   - pull_request: any target branch
+#   - push: develop, staging, main (catch direct pushes)
+#
+# Checks performed:
+#   1. YAML syntax lint (yamllint)
+#   2. Schema + required-field validation (validate.py)
+#   3. Naming convention enforcement (enforce_naming.py)
+#   4. Ownership completeness check (check_owners.py)
+# ============================================================
+
+name: Validate Metadata
+
+on:
+  pull_request:
+    paths:
+      - "metadata/**"
+      - "scripts/**"
+      - "ingestion/**"
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+    paths:
+      - "metadata/**"
+      - "scripts/**"
+      - "ingestion/**"
+
+permissions:
+  contents: read
+  pull-requests: write   # Needed to post inline PR comments
+  checks: write          # Needed to post check annotations
+
+jobs:
+  # ─────────────────────────────────────────────────
+  # JOB 1: YAML Lint
+  # ─────────────────────────────────────────────────
+  yaml-lint:
+    name: "YAML Syntax Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Create yamllint config
+        run: |
+          cat > .yamllint.yml << 'EOF'
+          extends: default
+          rules:
+            line-length:
+              max: 200
+              level: warning
+            truthy:
+              allowed-values: ['true', 'false', 'yes', 'no']
+            comments:
+              min-spaces-from-content: 1
+            document-start: disable
+          EOF
+
+      - name: Run yamllint on metadata/
+        run: |
+          yamllint -c .yamllint.yml metadata/ ingestion/
+        continue-on-error: false
+
+  # ─────────────────────────────────────────────────
+  # JOB 2: Schema & Required Field Validation
+  # ─────────────────────────────────────────────────
+  schema-validation:
+    name: "Schema & Required Field Validation"
+    runs-on: ubuntu-latest
+    needs: yaml-lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run validate.py
+        id: validate
+        run: |
+          python scripts/validate.py \
+            --metadata-dir metadata/ \
+            --verbose \
+            --output-format github-actions
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: reports/validation-report.json
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────
+  # JOB 3: Naming Convention Enforcement
+  # ─────────────────────────────────────────────────
+  naming-convention:
+    name: "Naming Convention Check"
+    runs-on: ubuntu-latest
+    needs: yaml-lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run enforce_naming.py
+        run: |
+          python scripts/enforce_naming.py \
+            --metadata-dir metadata/ \
+            --output-format github-actions
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # ─────────────────────────────────────────────────
+  # JOB 4: Ownership Completeness Check
+  # ─────────────────────────────────────────────────
+  ownership-check:
+    name: "Ownership Completeness Check"
+    runs-on: ubuntu-latest
+    needs: yaml-lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run check_owners.py
+        run: |
+          python scripts/check_owners.py \
+            --metadata-dir metadata/ \
+            --owners-registry metadata/ownership/owners.yaml \
+            --output-format github-actions
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # ─────────────────────────────────────────────────
+  # JOB 5: Post PR Summary Comment
+  # ─────────────────────────────────────────────────
+  pr-summary:
+    name: "Post Validation Summary"
+    runs-on: ubuntu-latest
+    needs: [schema-validation, naming-convention, ownership-check]
+    if: github.event_name == 'pull_request' && always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download validation report
+        uses: actions/download-artifact@v4
+        with:
+          name: validation-report
+          path: reports/
+        continue-on-error: true
+
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const jobs = ${{ toJSON(needs) }};
+
+            const schemaResult  = jobs['schema-validation'].result;
+            const namingResult  = jobs['naming-convention'].result;
+            const ownerResult   = jobs['ownership-check'].result;
+
+            const icon = r => r === 'success' ? '✅' : (r === 'skipped' ? '⏭️' : '❌');
+
+            const body = `## 🔍 Metadata Validation Results
+
+            | Check | Status |
+            |-------|--------|
+            | Schema & Required Fields | ${icon(schemaResult)} ${schemaResult} |
+            | Naming Conventions | ${icon(namingResult)} ${namingResult} |
+            | Ownership Completeness | ${icon(ownerResult)} ${ownerResult} |
+
+            ${schemaResult === 'failure' || namingResult === 'failure' || ownerResult === 'failure'
+              ? '> ❌ **One or more checks failed. This PR cannot be merged until all issues are resolved.**\n> See workflow logs for details.'
+              : '> ✅ **All checks passed. This PR is ready for governance review.**'}
+
+            _Validated at: ${new Date().toISOString()}_`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+

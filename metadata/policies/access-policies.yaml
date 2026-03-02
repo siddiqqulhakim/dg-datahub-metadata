@@ -1,0 +1,194 @@
+---
+# ============================================================
+# Access Policies
+# ============================================================
+# DataHub Metadata Policies define which actors (users/groups)
+# can perform which actions (privileges) on which resources
+# (datasets, domains, glossary, etc.)
+#
+# Policy types:
+#   METADATA_POLICY  — Controls who can view/edit metadata in DataHub UI
+#   DATA_POLICY      — Controls who can query the underlying data
+#
+# Privilege reference:
+#   VIEW_ENTITY_PAGE, EDIT_ENTITY_TAGS, EDIT_ENTITY_GLOSSARY_TERMS,
+#   EDIT_ENTITY_OWNERSHIP, EDIT_ENTITY_ASSERTIONS, MANAGE_GLOSSARIES,
+#   MANAGE_TAGS, MANAGE_DOMAINS, MANAGE_POLICIES
+# ============================================================
+
+version: "1"
+kind: policies
+
+policies:
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 1: All Employees — Read-only metadata access
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:all-employees-read"
+    name: "All Employees — Metadata Read Access"
+    description: |
+      All authenticated employees may view metadata (dataset descriptions,
+      schemas, lineage, tags, glossary terms) in the DataHub UI.
+      No edit privileges are granted by this policy.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      allUsers: true
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - VIEW_DATASET_USAGE
+      - VIEW_DATASET_PROFILE
+    resources:
+      allResources: true
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 2: Governance Team — Full metadata management
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:governance-team-manage"
+    name: "Governance Team — Full Metadata Management"
+    description: |
+      The governance team can create, edit, and delete all metadata artefacts
+      including domains, tags, glossary terms, and dataset metadata.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      groups:
+        - "urn:li:corpGroup:data-certification-board"
+        - "urn:li:corpGroup:platform-data-engineering"
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - EDIT_ENTITY_TAGS
+      - EDIT_ENTITY_GLOSSARY_TERMS
+      - EDIT_ENTITY_OWNERSHIP
+      - EDIT_ENTITY_ASSERTIONS
+      - EDIT_ENTITY_DOCS
+      - MANAGE_GLOSSARIES
+      - MANAGE_TAGS
+      - MANAGE_DOMAINS
+      - EDIT_DATASET_COL_DESCRIPTION
+      - EDIT_DATASET_COL_TAGS
+      - EDIT_DATASET_COL_GLOSSARY_TERMS
+    resources:
+      allResources: true
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 3: Finance Stewards — Edit Finance domain metadata
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:finance-stewards-edit"
+    name: "Finance Stewards — Edit Finance Domain Metadata"
+    description: |
+      Finance domain data stewards can edit metadata for all datasets,
+      glossary terms, and tags within the Finance domain only.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      users:
+        - "urn:li:corpuser:john.smith"
+        - "urn:li:corpuser:mary.johnson"
+      groups:
+        - "urn:li:corpGroup:finance-data-engineering"
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - EDIT_ENTITY_TAGS
+      - EDIT_ENTITY_GLOSSARY_TERMS
+      - EDIT_ENTITY_OWNERSHIP
+      - EDIT_ENTITY_DOCS
+      - EDIT_DATASET_COL_DESCRIPTION
+      - EDIT_DATASET_COL_TAGS
+      - EDIT_DATASET_COL_GLOSSARY_TERMS
+    resources:
+      resourceType: DATASET
+      filter:
+        domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 4: Raw Layer — Restricted access (data engineers only)
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:raw-layer-restricted"
+    name: "Raw Layer — Restricted to Data Engineers"
+    description: |
+      Raw datasets contain unmasked PII and unvalidated source data.
+      Access to raw-layer metadata and data is restricted to data engineering
+      groups only. Business analysts are NOT granted access to raw datasets.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      groups:
+        - "urn:li:corpGroup:finance-data-engineering"
+        - "urn:li:corpGroup:marketing-data-engineering"
+        - "urn:li:corpGroup:operations-data-engineering"
+        - "urn:li:corpGroup:platform-data-engineering"
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - EDIT_ENTITY_TAGS
+      - EDIT_ENTITY_DOCS
+    resources:
+      resourceType: DATASET
+      filter:
+        tag: "urn:li:tag:layer.raw"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 5: Compliance — Manage PII-tagged datasets
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:compliance-pii-manage"
+    name: "Compliance Team — PII Dataset Governance"
+    description: |
+      The compliance team (DPO) can view and update PII-tagged datasets
+      to ensure correct sensitivity classification and data subject rights
+      management. Required for GDPR Article 30 records of processing.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      users:
+        - "urn:li:corpuser:compliance.lead"
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - EDIT_ENTITY_TAGS
+      - EDIT_ENTITY_DOCS
+      - EDIT_ENTITY_ASSERTIONS
+    resources:
+      resourceType: DATASET
+      filter:
+        tag: "urn:li:tag:sensitivity.pii"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  # ──────────────────────────────────────────────────────────────
+  # POLICY 6: Certification Board — Manage Gold certifications
+  # ──────────────────────────────────────────────────────────────
+  - urn: "urn:li:dataHubPolicy:certification-board-gold"
+    name: "Certification Board — Gold Dataset Certification"
+    description: |
+      The Data Certification Board has exclusive authority to certify
+      Gold-layer datasets. Only members of this group may set or remove
+      the CERTIFIED status on a dataset.
+    type: METADATA_POLICY
+    state: ACTIVE
+    actors:
+      groups:
+        - "urn:li:corpGroup:data-certification-board"
+    privileges:
+      - VIEW_ENTITY_PAGE
+      - EDIT_ENTITY_ASSERTIONS
+      - MANAGE_ENTITY_DOCS
+      - EDIT_ENTITY_TAGS
+    resources:
+      resourceType: DATASET
+      filter:
+        tag: "urn:li:tag:layer.gold"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+

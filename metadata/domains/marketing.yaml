@@ -1,0 +1,53 @@
+---
+# ============================================================
+# Domain: Marketing
+# ============================================================
+version: "1"
+kind: domain
+
+urn: "urn:li:domain:marketing"
+name: "Marketing"
+description: |
+  The Marketing domain covers all data assets supporting marketing analytics,
+  campaign management, customer acquisition, digital marketing, and brand performance.
+
+  **Data types:** Behavioural, Campaign, Attribution, Customer Journey
+  **Upstream systems:** Salesforce Marketing Cloud, Google Analytics 4, Meta Ads,
+  Adobe Analytics, Segment CDP, HubSpot
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:alice.chen"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:bob.taylor"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:marketing-data-engineering"
+    source: MANUAL
+
+subDomains:
+  - urn: "urn:li:domain:marketing.campaigns"
+    name: "Campaigns"
+    description: "Paid, owned, and earned campaign performance data."
+  - urn: "urn:li:domain:marketing.customer_acquisition"
+    name: "Customer Acquisition"
+    description: "Lead generation, conversion funnels, CAC analysis."
+  - urn: "urn:li:domain:marketing.attribution"
+    name: "Attribution"
+    description: "Multi-touch attribution models, channel mix."
+  - urn: "urn:li:domain:marketing.customer_journey"
+    name: "Customer Journey"
+    description: "Touchpoint sequences, session data, engagement scores."
+
+customProperties:
+  domain_lead: "alice.chen"
+  business_unit: "Marketing & Growth"
+  cost_center: "CC-2002"
+  data_classification: "INTERNAL"
+  review_cycle: "quarterly"
+  compliance_frameworks: "GDPR,CCPA"
+  primary_source_systems: "Salesforce_MC,GA4,Meta_Ads,Segment"
+  created_date: "2024-01-15"
+  last_reviewed_date: "2025-01-10"
+

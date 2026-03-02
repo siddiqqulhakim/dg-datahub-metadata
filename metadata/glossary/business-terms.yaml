@@ -1,0 +1,221 @@
+---
+# ============================================================
+# Glossary: Business Terms
+# ============================================================
+# Contains business-facing terms defined by domain stewards.
+# These terms bridge business language and technical data assets.
+#
+# Hierarchy:
+#   GlossaryNode (parent)
+#     └── GlossaryTerm (child)
+#
+# Rules:
+#   - Term names must be PascalCase
+#   - No duplicate names allowed (enforced by validate.py)
+#   - Every term must have a definition > 50 characters
+#   - Every term must have at least one owner (type: STEWARD)
+#   - Every term must be linked to a domain
+# ============================================================
+
+version: "1"
+kind: glossary
+
+# ── GLOSSARY NODES (parent categories) ─────────────────────
+nodes:
+  - urn: "urn:li:glossaryNode:Finance"
+    name: "Finance"
+    description: "Business terms related to financial management, accounting, and reporting."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+
+  - urn: "urn:li:glossaryNode:Finance.AccountsPayable"
+    name: "Finance.AccountsPayable"
+    parentNode: "urn:li:glossaryNode:Finance"
+    description: "Terms specific to the accounts payable process."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+
+  - urn: "urn:li:glossaryNode:Finance.Revenue"
+    name: "Finance.Revenue"
+    parentNode: "urn:li:glossaryNode:Finance"
+    description: "Terms related to revenue recognition and reporting."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+
+  - urn: "urn:li:glossaryNode:Marketing"
+    name: "Marketing"
+    description: "Business terms related to marketing, campaigns, and customer acquisition."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:bob.taylor"
+
+  - urn: "urn:li:glossaryNode:Operations"
+    name: "Operations"
+    description: "Terms related to supply chain, logistics, and order management."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:frank.brown"
+
+# ── GLOSSARY TERMS ───────────────────────────────────────────
+terms:
+  # ── Finance / Accounts Payable ──────────────────────────────
+  - urn: "urn:li:glossaryTerm:finance.Invoice"
+    name: "Invoice"
+    definition: |
+      A commercial document issued by a vendor (seller) to a buyer specifying
+      the goods or services provided, the quantities, agreed prices, payment
+      terms, and the total amount owed. In the context of Accounts Payable,
+      an invoice represents a liability until it is paid.
+    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+    relatedTerms:
+      - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+      - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+    customProperties:
+      source: "Finance Domain Policy FIN-001"
+      approved_by: "CFO Office"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+    name: "AccountsPayable"
+    definition: |
+      A balance sheet liability account representing the total amount owed by a
+      company to its creditors (vendors/suppliers) for goods and services received
+      but not yet paid for. Accounts Payable is a component of working capital
+      and is managed through the AP sub-ledger in the ERP system.
+    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+    customProperties:
+      source: "IFRS IAS 37"
+      approved_by: "CFO Office"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+    name: "DaysPayableOutstanding"
+    definition: |
+      Days Payable Outstanding (DPO) measures how many days, on average, a company
+      takes to pay its vendors. It is calculated as:
+        DPO = (Accounts Payable / Cost of Goods Sold) × Number of Days
+      A higher DPO indicates that the company is taking longer to pay its suppliers,
+      which can improve cash flow but may strain vendor relationships.
+    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+    customProperties:
+      formula: "(AP_Balance / COGS) * Days_in_Period"
+      benchmark: "Industry average: 30-60 days"
+      approved_by: "CFO Office"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+    name: "PaymentTerms"
+    definition: |
+      The contractually agreed conditions under which a buyer will pay a vendor.
+      Payment terms define the payment due date and any applicable discounts for
+      early payment. Common examples: Net 30 (full payment due within 30 days),
+      2/10 Net 30 (2% discount if paid within 10 days, otherwise full amount due
+      within 30 days), Net 60, EOM (End of Month).
+    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+    customProperties:
+      source: "Procurement Policy PROC-004"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+    name: "InvoiceStatus"
+    definition: |
+      The current lifecycle stage of an AP invoice. Valid values are:
+        OPEN       — Invoice received and posted; payment not yet made
+        PAID       — Payment has been made and cleared
+        OVERDUE    — Payment is past due date and not yet paid
+        DISPUTED   — Invoice is under dispute with the vendor
+        CANCELLED  — Invoice has been voided/reversed
+    parentNode: "urn:li:glossaryNode:Finance.AccountsPayable"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:mary.johnson"
+    customProperties:
+      valid_values: "OPEN,PAID,OVERDUE,DISPUTED,CANCELLED"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:finance.CashFlow"
+    name: "CashFlow"
+    definition: |
+      The net amount of cash and cash equivalents moving into and out of a business
+      during a specific period. Positive cash flow indicates the company has more
+      cash coming in than going out; negative cash flow indicates the reverse.
+      In the context of AP, cash flow refers to the planned outflows to settle
+      vendor invoices within the payment due date windows.
+    parentNode: "urn:li:glossaryNode:Finance"
+    domain: "urn:li:domain:finance"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+    customProperties:
+      source: "IFRS IAS 7"
+      review_date: "2025-07-01"
+
+  # ── Marketing ────────────────────────────────────────────────
+  - urn: "urn:li:glossaryTerm:marketing.CampaignROI"
+    name: "CampaignROI"
+    definition: |
+      Return on Investment for a marketing campaign, calculated as:
+        Campaign ROI = ((Revenue Attributed - Campaign Cost) / Campaign Cost) × 100
+      Expressed as a percentage. A positive ROI indicates the campaign generated
+      more revenue than it cost.
+    parentNode: "urn:li:glossaryNode:Marketing"
+    domain: "urn:li:domain:marketing"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:bob.taylor"
+    customProperties:
+      formula: "((attributed_revenue - cost) / cost) * 100"
+      review_date: "2025-07-01"
+
+  - urn: "urn:li:glossaryTerm:marketing.CustomerAcquisitionCost"
+    name: "CustomerAcquisitionCost"
+    definition: |
+      The total cost of acquiring a new customer, calculated as the total marketing
+      and sales expenses divided by the number of new customers acquired in a given
+      period. CAC = Total Acquisition Costs / Number of New Customers.
+    parentNode: "urn:li:glossaryNode:Marketing"
+    domain: "urn:li:domain:marketing"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:bob.taylor"
+    customProperties:
+      formula: "total_acquisition_cost / new_customer_count"
+      review_date: "2025-07-01"
+
+  # ── Operations ───────────────────────────────────────────────
+  - urn: "urn:li:glossaryTerm:operations.OrderFulfillmentRate"
+    name: "OrderFulfillmentRate"
+    definition: |
+      The percentage of customer orders that are fulfilled completely and on time
+      without any cancellations or back-orders. Calculated as:
+        OFR = (Orders Fulfilled On Time / Total Orders Placed) × 100
+      Key KPI for supply chain performance measurement.
+    parentNode: "urn:li:glossaryNode:Operations"
+    domain: "urn:li:domain:operations"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:frank.brown"
+    customProperties:
+      target_threshold: "98.5%"
+      review_date: "2025-07-01"
+

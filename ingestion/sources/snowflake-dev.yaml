@@ -1,0 +1,108 @@
+# ============================================================
+# DataHub Ingestion Recipe: Snowflake — Development
+# ============================================================
+# This recipe crawls the development Snowflake account and
+# ingests technical metadata (schema, lineage, usage stats)
+# into the DEV DataHub instance.
+#
+# Usage:
+#   datahub ingest -c ingestion/sources/snowflake-dev.yaml
+#
+# Environment variables required (injected by GitHub Actions):
+#   SNOWFLAKE_ACCOUNT_DEV
+#   SNOWFLAKE_USER_DEV
+#   SNOWFLAKE_PASSWORD_DEV   (or use key-pair auth)
+#   SNOWFLAKE_WAREHOUSE_DEV
+#   DATAHUB_GMS_URL          (loaded from environments/dev/config.env)
+#   DATAHUB_GMS_TOKEN        (loaded from GitHub Secrets)
+# ============================================================
+
+source:
+  type: snowflake
+  config:
+    account_id: "${SNOWFLAKE_ACCOUNT_DEV}"
+    username: "${SNOWFLAKE_USER_DEV}"
+    password: "${SNOWFLAKE_PASSWORD_DEV}"
+    warehouse: "${SNOWFLAKE_WAREHOUSE_DEV}"
+    role: "DATAHUB_READER_ROLE"
+
+    # ── Schema pattern — dev databases only ────────────────
+    database_pattern:
+      allow:
+        - "^DEV_.*"
+        - "^REFERENCE$"
+      deny:
+        - "^INFORMATION_SCHEMA$"
+        - "^SNOWFLAKE$"
+
+    schema_pattern:
+      allow:
+        - "^RAW_.*"
+        - "^BRONZE_.*"
+        - "^SILVER_.*"
+        - "^GOLD_.*"
+        - "^REFERENCE$"
+      deny:
+        - "^INFORMATION_SCHEMA$"
+
+    table_pattern:
+      deny:
+        - ".*_BACKUP$"
+        - ".*_TMP$"
+        - ".*_TEMP$"
+
+    # ── Profile configuration ────────────────────────────────
+    profiling:
+      enabled: true
+      profile_table_level_only: false
+      max_number_of_fields_to_profile: 50
+      include_field_null_count: true
+      include_field_min_value: true
+      include_field_max_value: true
+      include_field_mean_value: true
+      include_field_distinct_count: true
+      include_field_sample_values: false   # Disabled — may expose PII in dev
+
+    # ── Lineage extraction ───────────────────────────────────
+    include_table_lineage: true
+    include_view_lineage: true
+    include_column_lineage: true
+    use_queries_v2: true
+
+    # ── Usage statistics ─────────────────────────────────────
+    include_usage_stats: true
+    bucket_duration: "DAY"
+    start_time: "-30d"
+
+    # ── Stateful ingestion (de-dup and soft-deletes) ─────────
+    stateful_ingestion:
+      enabled: true
+      remove_stale_metadata: true
+      fail_safe_threshold: 40.0
+
+    # ── Platform instance (maps to DEV environment) ──────────
+    platform_instance: "dev"
+
+    # ── Classify PII automatically ───────────────────────────
+    classification:
+      enabled: true
+      classifiers:
+        - type: datahub
+          config:
+            confidence_level_threshold: 0.7
+
+sink:
+  type: datahub-rest
+  config:
+    server: "${DATAHUB_GMS_URL}"
+    token: "${DATAHUB_GMS_TOKEN}"
+    max_threads: 5
+    retry_max_attempts: 3
+    retry_status_codes:
+      - 429
+      - 502
+      - 503
+      - 504
+
+pipeline_name: "snowflake-dev-ingestion"
+

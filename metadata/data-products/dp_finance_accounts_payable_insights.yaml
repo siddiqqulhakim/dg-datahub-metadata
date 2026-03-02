@@ -1,0 +1,92 @@
+---
+# ============================================================
+# Data Product: dp_finance_accounts_payable_insights
+# ============================================================
+# A Data Product is a curated, discoverable, governed collection
+# of data assets (datasets) packaged to serve a specific
+# business use case. Data Products are owned, have SLAs, and
+# are explicitly offered to defined consumers.
+#
+# Naming convention: dp_<domain>_<business_purpose>
+# ============================================================
+
+version: "1"
+kind: dataProduct
+
+urn: "urn:li:dataProduct:dp_finance_accounts_payable_insights"
+name: "dp_finance_accounts_payable_insights"
+displayName: "Finance — Accounts Payable Insights"
+
+description: |
+  The Accounts Payable Insights Data Product delivers authoritative, certified
+  AP analytics to Finance teams, the CFO office, and automated cash flow
+  forecasting systems.
+
+  **Business value delivered:**
+  - Real-time visibility into outstanding invoice liabilities
+  - Vendor payment performance tracking and DPO benchmarking
+  - Early payment discount opportunity identification
+  - Cash flow forecast inputs (5-day and 30-day rolling windows)
+  - SOX audit-ready AP data with full lineage to SAP source
+
+  **Primary consumers:**
+  - Finance BI team (Tableau dashboards)
+  - CFO Office (Excel/Power BI executive packs)
+  - Treasury team (cash flow models)
+  - External audit (read-only SOX access)
+
+domain: "urn:li:domain:finance"
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+# ── Input Assets (lineage inputs) ───────────────────────────
+inputAssets:
+  - urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.silver_finance.ap_invoice,PROD)"
+    description: "Silver-layer AP invoice dataset — primary input."
+
+# ── Output Assets (what consumers use) ──────────────────────
+outputAssets:
+  - urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.gold_finance.ap_invoice_summary,PROD)"
+    description: "Certified gold-layer AP invoice summary — primary consumer-facing asset."
+    sla: "Available by 08:30 UTC daily"
+    certificationStatus: "CERTIFIED"
+
+tags:
+  - urn: "urn:li:tag:sensitivity.financial"
+  - urn: "urn:li:tag:compliance.sox"
+  - urn: "urn:li:tag:sla.high"
+  - urn: "urn:li:tag:certified"
+
+glossaryTerms:
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance.CashFlow"
+
+# ── Consumer SLA ─────────────────────────────────────────────
+sla:
+  availability: "99.9%"
+  freshness: "Data available by 08:30 UTC daily"
+  incidentResponseTime: "15 minutes (P1)"
+  supportChannel: "#finance-data-support"
+
+customProperties:
+  domain: "finance"
+  business_purpose: "accounts_payable_insights"
+  data_product_tier: "GOLD"
+  refresh_frequency: "daily"
+  consumer_count: "45"
+  primary_bi_tool: "Tableau"
+  jira_project: "FINDATA"
+  runbook_url: "https://wiki.company.com/dp/finance-ap-insights"
+  created_date: "2024-05-15"
+  last_reviewed_date: "2025-01-20"
+

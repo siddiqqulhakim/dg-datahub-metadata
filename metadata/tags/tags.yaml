@@ -1,0 +1,256 @@
+---
+# ============================================================
+# Tag Catalogue
+# ============================================================
+# All DataHub tags used across the governance repository.
+# Tags must be defined here before they can be referenced in
+# dataset YAML files. Referencing an undefined tag will cause
+# validate.py to fail.
+#
+# Tag naming convention:
+#   <category>.<subcategory>   (all lowercase, dot-separated)
+#
+# Categories:
+#   sensitivity   — Data sensitivity and classification
+#   layer         — Medallion architecture layer
+#   source        — Source system origin
+#   usage         — Approved usage patterns
+#   pii           — PII field-level tagging
+#   compliance    — Regulatory compliance flags
+#   ingestion     — Ingestion method metadata
+#   sla           — SLA tier
+#   field         — Field-level structural tags
+#   certified     — Certification status
+# ============================================================
+
+version: "1"
+kind: tags
+
+tags:
+  # ── Sensitivity Tags ─────────────────────────────────────────
+  - urn: "urn:li:tag:sensitivity.pii"
+    name: "sensitivity.pii"
+    description: |
+      Dataset or field contains Personally Identifiable Information (PII).
+      Access must be restricted. Downstream consumers must not expose
+      raw PII values. See regulatory term 'PII' for full definition.
+    colorHex: "#E53E3E"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  - urn: "urn:li:tag:sensitivity.financial"
+    name: "sensitivity.financial"
+    description: |
+      Dataset contains financial data. Access is restricted to authorised
+      Finance team members and approved analytics consumers.
+    colorHex: "#D69E2E"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:john.smith"
+
+  - urn: "urn:li:tag:sensitivity.confidential"
+    name: "sensitivity.confidential"
+    description: |
+      Dataset is classified CONFIDENTIAL. Not for external sharing.
+      Internal access only on a need-to-know basis.
+    colorHex: "#C05621"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  - urn: "urn:li:tag:sensitivity.internal"
+    name: "sensitivity.internal"
+    description: "Dataset is for internal use only. Not for external distribution."
+    colorHex: "#2B6CB0"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  - urn: "urn:li:tag:sensitivity.public"
+    name: "sensitivity.public"
+    description: "Dataset is approved for public distribution or open access."
+    colorHex: "#276749"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:compliance.lead"
+
+  # ── PII Field-Level Tags ─────────────────────────────────────
+  - urn: "urn:li:tag:pii.email"
+    name: "pii.email"
+    description: "Field contains email address — PII field."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.phone_number"
+    name: "pii.phone_number"
+    description: "Field contains phone number — PII field."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.full_name"
+    name: "pii.full_name"
+    description: "Field contains a person's full name — PII field."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.date_of_birth"
+    name: "pii.date_of_birth"
+    description: "Field contains date of birth — PII field."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.national_id"
+    name: "pii.national_id"
+    description: "Field contains national ID / SSN / passport number — PII field."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.ip_address"
+    name: "pii.ip_address"
+    description: "Field contains IP address — may constitute PII under GDPR."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:pii.hashed"
+    name: "pii.hashed"
+    description: "Field was originally PII but has been hashed (SHA-256). Not raw PII."
+    colorHex: "#ED8936"
+
+  # ── Medallion Layer Tags ─────────────────────────────────────
+  - urn: "urn:li:tag:layer.raw"
+    name: "layer.raw"
+    description: "Source-aligned raw data. No transformations applied."
+    colorHex: "#718096"
+
+  - urn: "urn:li:tag:layer.bronze"
+    name: "layer.bronze"
+    description: "Cleaned and deduplicated data. PII handled. Not for direct consumption."
+    colorHex: "#B7791F"
+
+  - urn: "urn:li:tag:layer.silver"
+    name: "layer.silver"
+    description: "Business-conformed, enriched data. Ready for team-level analytics."
+    colorHex: "#718096"
+
+  - urn: "urn:li:tag:layer.gold"
+    name: "layer.gold"
+    description: "Certified, SLA-backed aggregations. Executive and self-service grade."
+    colorHex: "#D69E2E"
+
+  # ── Source System Tags ───────────────────────────────────────
+  - urn: "urn:li:tag:source.sap_erp"
+    name: "source.sap_erp"
+    description: "Data originates from SAP ERP (S/4HANA or ECC)."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:source.salesforce"
+    name: "source.salesforce"
+    description: "Data originates from Salesforce CRM."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:source.google_analytics"
+    name: "source.google_analytics"
+    description: "Data originates from Google Analytics 4."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:source.kafka"
+    name: "source.kafka"
+    description: "Data originates from Kafka event streams."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:source.dbt"
+    name: "source.dbt"
+    description: "Dataset is generated/managed by a dbt model."
+    colorHex: "#4A5568"
+
+  # ── Usage Tags ───────────────────────────────────────────────
+  - urn: "urn:li:tag:usage.analytics_ready"
+    name: "usage.analytics_ready"
+    description: "Dataset is approved for use in analytics workloads."
+    colorHex: "#276749"
+
+  - urn: "urn:li:tag:usage.self_service"
+    name: "usage.self_service"
+    description: "Dataset is approved for self-service analytics by business users."
+    colorHex: "#276749"
+
+  - urn: "urn:li:tag:usage.executive_reporting"
+    name: "usage.executive_reporting"
+    description: "Dataset is approved for use in executive-level reports."
+    colorHex: "#276749"
+
+  - urn: "urn:li:tag:usage.ml_feature"
+    name: "usage.ml_feature"
+    description: "Dataset or field is used as a machine learning feature."
+    colorHex: "#6B46C1"
+
+  - urn: "urn:li:tag:usage.restricted"
+    name: "usage.restricted"
+    description: "Dataset access is restricted — requires explicit approval."
+    colorHex: "#E53E3E"
+
+  # ── Compliance Tags ──────────────────────────────────────────
+  - urn: "urn:li:tag:compliance.sox"
+    name: "compliance.sox"
+    description: "Dataset contributes to financial statements and is in scope for SOX."
+    colorHex: "#744210"
+
+  - urn: "urn:li:tag:compliance.gdpr"
+    name: "compliance.gdpr"
+    description: "Dataset is in scope for GDPR and must comply with data subject rights."
+    colorHex: "#744210"
+
+  - urn: "urn:li:tag:compliance.ccpa"
+    name: "compliance.ccpa"
+    description: "Dataset is in scope for CCPA (California Consumer Privacy Act)."
+    colorHex: "#744210"
+
+  # ── Ingestion Method Tags ────────────────────────────────────
+  - urn: "urn:li:tag:ingestion.full_load"
+    name: "ingestion.full_load"
+    description: "Dataset is refreshed via full load (truncate and reload)."
+    colorHex: "#4A5568"
+
+  - urn: "urn:li:tag:ingestion.incremental"
+    name: "ingestion.incremental"
+    description: "Dataset is refreshed via incremental/delta load."
+    colorHex: "#4A5568"
+
+  - urn: "urn:li:tag:ingestion.streaming"
+    name: "ingestion.streaming"
+    description: "Dataset is populated via streaming ingestion (near real-time)."
+    colorHex: "#4A5568"
+
+  # ── SLA Tier Tags ────────────────────────────────────────────
+  - urn: "urn:li:tag:sla.high"
+    name: "sla.high"
+    description: "P1 SLA: 99.9% daily availability. Incidents page on-call within 15 min."
+    colorHex: "#E53E3E"
+
+  - urn: "urn:li:tag:sla.medium"
+    name: "sla.medium"
+    description: "P2 SLA: 99.5% daily availability. Incidents resolved within 4 hours."
+    colorHex: "#D69E2E"
+
+  - urn: "urn:li:tag:sla.standard"
+    name: "sla.standard"
+    description: "P3 SLA: Best-effort availability. Business-hours support."
+    colorHex: "#718096"
+
+  # ── Field Structural Tags ────────────────────────────────────
+  - urn: "urn:li:tag:field.primary_key"
+    name: "field.primary_key"
+    description: "This field is the primary key of the table."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:field.partition_key"
+    name: "field.partition_key"
+    description: "This field is used as a partition key for query optimisation."
+    colorHex: "#2B6CB0"
+
+  - urn: "urn:li:tag:field.foreign_key"
+    name: "field.foreign_key"
+    description: "This field is a foreign key reference to another dataset."
+    colorHex: "#2B6CB0"
+
+  # ── Certification Tag ────────────────────────────────────────
+  - urn: "urn:li:tag:certified"
+    name: "certified"
+    description: "Dataset has been formally certified by the Data Certification Board."
+    colorHex: "#276749"
+

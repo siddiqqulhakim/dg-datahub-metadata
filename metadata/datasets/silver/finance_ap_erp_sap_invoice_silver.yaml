@@ -1,0 +1,246 @@
+---
+# ============================================================
+# Dataset: finance.accounts_payable.erp_sap.invoice.silver
+# Layer:   SILVER (business-conformed, enriched, ready for analytics)
+# ============================================================
+# Silver applies business logic transformations:
+#   - Maps SAP codes to business-readable labels (BLART → document_type)
+#   - Joins with vendor master, company master, cost centre data
+#   - Computes payment terms, days payable outstanding (DPO)
+#   - Conforms to Finance domain canonical data model
+#   - Currency conversion to USD (base reporting currency)
+# ============================================================
+
+version: "1"
+kind: dataset
+
+urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.silver_finance.ap_invoice,PROD)"
+name: "finance.accounts_payable.erp_sap.invoice.silver"
+platform: "urn:li:dataPlatform:snowflake"
+
+description: |
+  Business-conformed silver version of the AP invoice dataset.
+  Suitable for direct use in Finance dashboards, self-service analytics,
+  and as an input to gold-layer aggregations.
+
+  **Business logic applied:**
+  - Document type codes decoded to human-readable labels
+  - Vendor master enrichment (vendor name, category, country, payment terms)
+  - Company code → Legal entity name and region mapping
+  - Currency conversion to USD using daily ECB rates
+  - DPO calculation: `DUEDATE - BUDAT`
+  - Invoice status classification (OPEN, PAID, OVERDUE, DISPUTED)
+
+  **Certified for use in:** AP Aging, Vendor Performance, Cash Flow Forecasting
+
+domain: "urn:li:domain:finance"
+subDomain: "urn:li:domain:finance.accounts_payable"
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+tags:
+  - urn: "urn:li:tag:sensitivity.financial"
+  - urn: "urn:li:tag:layer.silver"
+  - urn: "urn:li:tag:source.sap_erp"
+  - urn: "urn:li:tag:usage.analytics_ready"
+  - urn: "urn:li:tag:usage.self_service"
+
+glossaryTerms:
+  - urn: "urn:li:glossaryTerm:finance.Invoice"
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+  - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+  - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+
+schema:
+  fields:
+    - name: "invoice_key"
+      type: STRING
+      nativeDataType: "VARCHAR(30)"
+      description: "Surrogate key: <MANDT>-<BUKRS>-<BELNR>-<GJAHR>. Primary key."
+      nullable: false
+      tags:
+        - urn: "urn:li:tag:field.primary_key"
+
+    - name: "company_code"
+      type: STRING
+      nativeDataType: "VARCHAR(4)"
+      description: "SAP company code."
+      nullable: false
+
+    - name: "legal_entity_name"
+      type: STRING
+      nativeDataType: "VARCHAR(100)"
+      description: "Human-readable legal entity name mapped from company code."
+      nullable: false
+
+    - name: "legal_entity_region"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Geographic region of the legal entity (EMEA, APAC, AMER)."
+      nullable: false
+
+    - name: "document_number"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "SAP accounting document number."
+      nullable: false
+
+    - name: "fiscal_year"
+      type: INTEGER
+      nativeDataType: "SMALLINT"
+      description: "Fiscal year of the posting."
+      nullable: false
+
+    - name: "document_type"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Decoded document type (e.g., 'Vendor Invoice', 'Payment')."
+      nullable: false
+
+    - name: "document_date"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Date on the invoice document from the vendor."
+      nullable: true
+
+    - name: "posting_date"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Date the invoice was posted in the ERP system."
+      nullable: false
+
+    - name: "due_date"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Calculated payment due date based on vendor payment terms."
+      nullable: true
+
+    - name: "invoice_status"
+      type: STRING
+      nativeDataType: "VARCHAR(20)"
+      description: "Current status: OPEN | PAID | OVERDUE | DISPUTED | CANCELLED."
+      nullable: false
+      glossaryTerms:
+        - urn: "urn:li:glossaryTerm:finance.InvoiceStatus"
+
+    - name: "vendor_id"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Vendor account number from SAP."
+      nullable: true
+
+    - name: "vendor_name"
+      type: STRING
+      nativeDataType: "VARCHAR(100)"
+      description: "Vendor company name from vendor master."
+      nullable: true
+
+    - name: "vendor_category"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Vendor category/segment (e.g., DIRECT, INDIRECT, CAPEX)."
+      nullable: true
+
+    - name: "vendor_country_code"
+      type: STRING
+      nativeDataType: "VARCHAR(2)"
+      description: "ISO 3166-1 alpha-2 country code of vendor."
+      nullable: true
+
+    - name: "payment_terms"
+      type: STRING
+      nativeDataType: "VARCHAR(50)"
+      description: "Payment terms description (e.g., 'Net 30', '2/10 Net 30')."
+      nullable: true
+      glossaryTerms:
+        - urn: "urn:li:glossaryTerm:finance.PaymentTerms"
+
+    - name: "amount_local_currency"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Invoice amount in the document's local currency."
+      nullable: true
+
+    - name: "local_currency_code"
+      type: STRING
+      nativeDataType: "VARCHAR(5)"
+      description: "ISO 4217 currency code of the local amount."
+      nullable: true
+
+    - name: "amount_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Invoice amount converted to USD using ECB daily exchange rate."
+      nullable: true
+
+    - name: "exchange_rate_to_usd"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(10,6)"
+      description: "Exchange rate applied for USD conversion (ECB rate on posting_date)."
+      nullable: true
+
+    - name: "days_payable_outstanding"
+      type: INTEGER
+      nativeDataType: "SMALLINT"
+      description: "Days between posting_date and due_date (DPO metric)."
+      nullable: true
+      glossaryTerms:
+        - urn: "urn:li:glossaryTerm:finance.DaysPayableOutstanding"
+
+    - name: "cost_centre"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Cost centre code for cost allocation."
+      nullable: true
+
+    - name: "_updated_at"
+      type: TIMESTAMP
+      nativeDataType: "TIMESTAMP_NTZ(9)"
+      description: "UTC timestamp of the last update to this record in the silver layer."
+      nullable: false
+
+lineage:
+  upstreams:
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.bronze_finance.ap_invoice,PROD)"
+      type: TRANSFORMED
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.bronze_finance.vendor_master,PROD)"
+      type: TRANSFORMED
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.bronze_finance.company_master,PROD)"
+      type: TRANSFORMED
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.reference.ecb_fx_rates,PROD)"
+      type: TRANSFORMED
+
+  transformationDescription: |
+    dbt model: models/silver/finance/silver_ap_invoice.sql
+    Applied: code decoding, vendor enrichment, FX conversion, DPO calc, status logic
+
+freshness:
+  schedule: "0 7 * * *"
+  expectedLatency: "PT1H"
+  sla: "08:00 UTC"
+
+customProperties:
+  layer: "silver"
+  domain: "finance"
+  subdomain: "accounts_payable"
+  source_system: "SAP_S4HANA"
+  dbt_model: "silver_ap_invoice"
+  dbt_project: "finance_silver"
+  estimated_row_count: "4800000"
+  refresh_frequency: "daily"
+  retention_days: "2555"
+  contains_pii: "false"
+  approved_for_self_service: "true"
+  created_date: "2024-04-01"
+  last_schema_change_date: "2025-01-20"
+

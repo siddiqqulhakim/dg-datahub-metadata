@@ -1,0 +1,198 @@
+---
+# ============================================================
+# Dataset: finance.accounts_payable.erp_sap.invoice.bronze
+# Layer:   BRONZE (cleaned, typed, deduplicated — still source-aligned)
+# ============================================================
+# Bronze layer applies the following transformations from raw:
+#   - Type casting to proper data types
+#   - Deduplication by (BUKRS, BELNR, GJAHR)
+#   - NULL handling for mandatory fields
+#   - PII masking: VENDOR_EMAIL and VENDOR_PHONE are hashed (SHA-256)
+#   - Metadata columns (_PROCESSED_AT, _IS_DELETED) added
+#   - Invalid rows flagged via _DATA_QUALITY_SCORE column
+# ============================================================
+
+version: "1"
+kind: dataset
+
+urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.bronze_finance.ap_invoice,PROD)"
+name: "finance.accounts_payable.erp_sap.invoice.bronze"
+platform: "urn:li:dataPlatform:snowflake"
+
+description: |
+  Bronze (cleaned) version of the SAP AP invoice dataset. Raw data has been
+  deduplicated, type-cast, PII-hashed, and augmented with data quality metrics.
+
+  **Key transformations applied:**
+  - Deduplication on (BUKRS, BELNR, GJAHR) — latest record wins
+  - VENDOR_EMAIL and VENDOR_PHONE replaced with SHA-256 hash
+  - BLDAT, BUDAT cast to proper DATE type; DMBTR to DECIMAL(15,2)
+  - Invalid currency codes set to NULL and flagged in _DATA_QUALITY_ISSUES
+  - `_DATA_QUALITY_SCORE` (0–100) computed per row
+
+  **NOT suitable for direct business consumption** — use silver layer.
+
+domain: "urn:li:domain:finance"
+subDomain: "urn:li:domain:finance.accounts_payable"
+
+owners:
+  - type: DATAOWNER
+    id: "urn:li:corpuser:john.smith"
+    source: MANUAL
+  - type: STEWARD
+    id: "urn:li:corpuser:mary.johnson"
+    source: MANUAL
+  - type: TECHNICAL_OWNER
+    id: "urn:li:corpGroup:finance-data-engineering"
+    source: MANUAL
+
+tags:
+tags:
+  - urn: "urn:li:tag:sensitivity.pii"
+  - urn: "urn:li:tag:sensitivity.financial"
+  - urn: "urn:li:tag:layer.bronze"
+  - urn: "urn:li:tag:source.sap_erp"
+  - urn: "urn:li:tag:pii.hashed"
+
+glossaryTerms:
+  - urn: "urn:li:glossaryTerm:finance.Invoice"
+  - urn: "urn:li:glossaryTerm:finance.AccountsPayable"
+  - urn: "urn:li:glossaryTerm:technical.DataQualityScore"
+
+schema:
+  fields:
+    - name: "MANDT"
+      type: STRING
+      nativeDataType: "VARCHAR(3)"
+      description: "SAP Client/Tenant identifier."
+      nullable: false
+
+    - name: "BUKRS"
+      type: STRING
+      nativeDataType: "VARCHAR(4)"
+      description: "Company code."
+      nullable: false
+
+    - name: "BELNR"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Accounting document number."
+      nullable: false
+
+    - name: "GJAHR"
+      type: INTEGER
+      nativeDataType: "SMALLINT"
+      description: "Fiscal year."
+      nullable: false
+
+    - name: "BLDAT"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Document date."
+      nullable: true
+
+    - name: "BUDAT"
+      type: DATE
+      nativeDataType: "DATE"
+      description: "Posting date."
+      nullable: false
+
+    - name: "BLART"
+      type: STRING
+      nativeDataType: "VARCHAR(2)"
+      description: "Document type code."
+      nullable: false
+
+    - name: "LIFNR"
+      type: STRING
+      nativeDataType: "VARCHAR(10)"
+      description: "Vendor account number."
+      nullable: true
+
+    - name: "DMBTR"
+      type: DECIMAL
+      nativeDataType: "DECIMAL(15,2)"
+      description: "Amount in local currency."
+      nullable: true
+
+    - name: "WAERS"
+      type: STRING
+      nativeDataType: "VARCHAR(5)"
+      description: "Currency key (ISO 4217). NULL if invalid."
+      nullable: true
+
+    - name: "VENDOR_EMAIL_HASH"
+      type: STRING
+      nativeDataType: "VARCHAR(64)"
+      description: "SHA-256 hash of vendor email. Original PII masked."
+      nullable: true
+      tags:
+        - urn: "urn:li:tag:pii.hashed"
+
+    - name: "VENDOR_PHONE_HASH"
+      type: STRING
+      nativeDataType: "VARCHAR(64)"
+      description: "SHA-256 hash of vendor phone. Original PII masked."
+      nullable: true
+      tags:
+        - urn: "urn:li:tag:pii.hashed"
+
+    - name: "_DATA_QUALITY_SCORE"
+      type: INTEGER
+      nativeDataType: "TINYINT"
+      description: "Row-level data quality score from 0 (worst) to 100 (perfect)."
+      nullable: false
+
+    - name: "_DATA_QUALITY_ISSUES"
+      type: STRING
+      nativeDataType: "VARIANT"
+      description: "JSON array of data quality issue codes detected on this row."
+      nullable: true
+
+    - name: "_IS_DELETED"
+      type: BOOLEAN
+      nativeDataType: "BOOLEAN"
+      description: "Soft-delete flag — TRUE if record was deleted in source."
+      nullable: false
+
+    - name: "_PROCESSED_AT"
+      type: TIMESTAMP
+      nativeDataType: "TIMESTAMP_NTZ(9)"
+      description: "UTC timestamp when this row was processed by the bronze pipeline."
+      nullable: false
+
+    - name: "_SOURCE_LOAD_ID"
+      type: STRING
+      nativeDataType: "VARCHAR(64)"
+      description: "Reference to the raw layer batch that sourced this record."
+      nullable: false
+
+lineage:
+  upstreams:
+    - dataset: "urn:li:dataset:(urn:li:dataPlatform:snowflake,prod.raw_finance.ap_invoice,PROD)"
+      type: TRANSFORMED
+
+  transformationDescription: |
+    dbt model: models/bronze/finance/bronze_ap_invoice.sql
+    Applied: deduplication, type casting, PII hashing, DQ scoring
+
+freshness:
+  schedule: "0 5 * * *"
+  expectedLatency: "PT1H"
+  sla: "06:00 UTC"
+
+customProperties:
+  layer: "bronze"
+  domain: "finance"
+  subdomain: "accounts_payable"
+  source_system: "SAP_S4HANA"
+  dbt_model: "bronze_ap_invoice"
+  dbt_project: "finance_bronze"
+  estimated_row_count: "5000000"
+  refresh_frequency: "daily"
+  retention_days: "730"
+  contains_pii: "false"
+  pii_handling: "hashed_sha256"
+  created_date: "2024-03-15"
+  last_schema_change_date: "2025-01-15"
+

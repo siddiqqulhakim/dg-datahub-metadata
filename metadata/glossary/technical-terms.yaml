@@ -1,0 +1,114 @@
+---
+# ============================================================
+# Glossary: Technical Terms
+# ============================================================
+# Contains engineering and platform-level technical terms.
+# These help data consumers understand how data is processed
+# and what platform-level concepts mean.
+# ============================================================
+
+version: "1"
+kind: glossary
+
+nodes:
+  - urn: "urn:li:glossaryNode:Technical"
+    name: "Technical"
+    description: "Engineering, platform, and data architecture terms."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+
+  - urn: "urn:li:glossaryNode:Technical.DataQuality"
+    name: "Technical.DataQuality"
+    parentNode: "urn:li:glossaryNode:Technical"
+    description: "Data quality measurement and scoring concepts."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:diana.lee"
+
+  - urn: "urn:li:glossaryNode:Technical.Architecture"
+    name: "Technical.Architecture"
+    parentNode: "urn:li:glossaryNode:Technical"
+    description: "Platform architecture patterns (Medallion, Lakehouse, etc.)."
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+
+terms:
+  - urn: "urn:li:glossaryTerm:technical.DataQualityScore"
+    name: "DataQualityScore"
+    definition: |
+      A row-level composite score between 0 and 100 that measures the overall
+      data quality of a record. The score is computed as a weighted average of
+      individual DQ dimensions: completeness (30%), validity (30%), uniqueness (20%),
+      consistency (20%). A score ≥ 95 is considered "high quality". Scores below 80
+      trigger data quality alerts.
+    parentNode: "urn:li:glossaryNode:Technical.DataQuality"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:diana.lee"
+    customProperties:
+      dimensions: "completeness,validity,uniqueness,consistency"
+      passing_threshold: "95"
+      alert_threshold: "80"
+
+  - urn: "urn:li:glossaryTerm:technical.GoldDataset"
+    name: "GoldDataset"
+    definition: |
+      A Gold dataset is the highest certification tier in the Medallion
+      architecture. It is a curated, certified, business-ready dataset suitable
+      for executive reporting, self-service analytics, and ML feature stores.
+      Gold datasets must pass a formal certification process, have a documented
+      SLA, at least one DATAOWNER and one STEWARD, and full lineage documented
+      to source systems.
+    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+    customProperties:
+      certification_required: "true"
+      sla_required: "true"
+      lineage_required: "true"
+
+  - urn: "urn:li:glossaryTerm:technical.MedallionArchitecture"
+    name: "MedallionArchitecture"
+    definition: |
+      A data design pattern that organises data into quality tiers in a
+      data lakehouse or data warehouse. The four tiers are:
+        RAW    — Source-aligned, unmodified data. Ingested as-is.
+        BRONZE — Cleaned and typed. Deduplication applied. PII handled.
+        SILVER — Business-conformed. Enriched. Analytics-ready for teams.
+        GOLD   — Certified aggregations. SLA-backed. Executive-grade.
+      Each tier builds on the previous, with explicit lineage documented.
+    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:carlos.rodriguez"
+
+  - urn: "urn:li:glossaryTerm:technical.SurrogateKey"
+    name: "SurrogateKey"
+    definition: |
+      A surrogate key is a system-generated, meaningless identifier assigned to
+      each record as its primary key. In this platform, surrogate keys are computed
+      as MD5 or SHA-256 hashes of the natural key columns. Surrogate keys enable
+      stable cross-system joins independent of source system ID changes.
+    parentNode: "urn:li:glossaryNode:Technical"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:diana.lee"
+
+  - urn: "urn:li:glossaryTerm:technical.SlowlyChangingDimension"
+    name: "SlowlyChangingDimension"
+    definition: |
+      A Slowly Changing Dimension (SCD) is a dimension table design pattern that
+      handles attribute changes over time. This platform uses SCD Type 2 for most
+      dimension tables: when an attribute changes, the existing row is closed
+      (is_current=false, valid_to=change_date) and a new row is inserted
+      (is_current=true, valid_from=change_date, valid_to=9999-12-31).
+    parentNode: "urn:li:glossaryNode:Technical.Architecture"
+    owners:
+      - type: STEWARD
+        id: "urn:li:corpuser:diana.lee"
+    customProperties:
+      default_scd_type: "SCD2"
+
