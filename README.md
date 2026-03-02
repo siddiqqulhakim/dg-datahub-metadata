@@ -1,9 +1,5 @@
 # DataHub Governance — Metadata-as-Code Repository
 
-[![Validate Metadata](https://github.com/your-org/datahub-governance/actions/workflows/validate-metadata.yml/badge.svg)](https://github.com/your-org/datahub-governance/actions/workflows/validate-metadata.yml)
-[![Deploy Dev](https://github.com/your-org/datahub-governance/actions/workflows/deploy-dev.yml/badge.svg?branch=develop)](https://github.com/your-org/datahub-governance/actions/workflows/deploy-dev.yml)
-[![Deploy Prod](https://github.com/your-org/datahub-governance/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/your-org/datahub-governance/actions/workflows/deploy-prod.yml)
-
 ---
 
 ## Overview
@@ -56,8 +52,7 @@ All metadata changes — datasets, domains, glossary terms, tags, ownership, pol
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-org/datahub-governance.git
-cd datahub-governance
+git clone https://github.com/siddiqqulhakim/dg-datahub-metadata.git
 ```
 
 ### 2. Install dependencies
